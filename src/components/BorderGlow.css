@@ -1,0 +1,132 @@
+.border-glow-card {
+  --edge-proximity: 0;
+  --cursor-angle: 45deg;
+  --edge-sensitivity: 18;
+  --color-sensitivity: calc(var(--edge-sensitivity) + 8);
+  --border-radius: 28px;
+  --glow-padding: 64px;
+  --cone-spread: 18;
+
+  position: relative;
+  display: grid;
+  min-height: inherit;
+  border-radius: var(--border-radius);
+  isolation: isolate;
+  transform: translate3d(0, 0, 0.01px);
+  border: 1px solid rgb(255 255 255 / 15%);
+  background: var(--card-bg, #0d0c13);
+  overflow: visible;
+  box-shadow:
+    rgba(0, 0, 0, 0.16) 0 1px 2px,
+    rgba(0, 0, 0, 0.16) 0 8px 20px,
+    rgba(0, 0, 0, 0.24) 0 26px 70px,
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+  transition: border-color .28s ease, box-shadow .28s ease, transform .28s ease;
+}
+
+.border-glow-card::before,
+.border-glow-card > .edge-light {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity .25s ease-out;
+  z-index: -1;
+}
+
+.border-glow-card::before {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card-bg, #0d0c13) 0 100%) padding-box,
+    linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+    var(--gradient-one) border-box,
+    var(--gradient-two) border-box,
+    var(--gradient-three) border-box,
+    var(--gradient-four) border-box,
+    var(--gradient-five) border-box,
+    var(--gradient-six) border-box,
+    var(--gradient-seven) border-box,
+    var(--gradient-base) border-box;
+  opacity: clamp(0, calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity))), 1);
+  mask-image:
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      black 0%,
+      black calc(var(--cone-spread) * 1%),
+      transparent calc((var(--cone-spread) + 10) * 1%),
+      transparent calc((100 - var(--cone-spread) - 10) * 1%),
+      black calc((100 - var(--cone-spread)) * 1%),
+      black 100%
+    );
+  filter: saturate(1.08);
+}
+
+.border-glow-card > .edge-light {
+  inset: calc(var(--glow-padding) * -1);
+  pointer-events: none;
+  z-index: 1;
+  mask-image:
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      black 2.5%,
+      transparent 10%,
+      transparent 90%,
+      black 97.5%
+    );
+  opacity: clamp(0, calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity))), 1);
+  mix-blend-mode: plus-lighter;
+}
+
+.border-glow-card > .edge-light::before {
+  content: "";
+  position: absolute;
+  inset: var(--glow-padding);
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px var(--glow-color, hsl(192deg 88% 76% / 100%)),
+    inset 0 0 1px 0 var(--glow-color-60, hsl(192deg 88% 76% / 60%)),
+    inset 0 0 3px 0 var(--glow-color-50, hsl(192deg 88% 76% / 50%)),
+    inset 0 0 6px 0 var(--glow-color-40, hsl(192deg 88% 76% / 40%)),
+    inset 0 0 15px 0 var(--glow-color-30, hsl(192deg 88% 76% / 30%)),
+    inset 0 0 25px 2px var(--glow-color-20, hsl(192deg 88% 76% / 20%)),
+    inset 0 0 50px 2px var(--glow-color-10, hsl(192deg 88% 76% / 10%)),
+    0 0 1px 0 var(--glow-color-60, hsl(192deg 88% 76% / 60%)),
+    0 0 3px 0 var(--glow-color-50, hsl(192deg 88% 76% / 50%)),
+    0 0 6px 0 var(--glow-color-40, hsl(192deg 88% 76% / 40%)),
+    0 0 15px 0 var(--glow-color-30, hsl(192deg 88% 76% / 30%)),
+    0 0 25px 2px var(--glow-color-20, hsl(192deg 88% 76% / 20%)),
+    0 0 50px 2px var(--glow-color-10, hsl(192deg 88% 76% / 10%));
+}
+
+.border-glow-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: inherit;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.01) 42%, rgba(255,255,255,.025)),
+    var(--card-bg, #0d0c13);
+}
+
+.border-glow-inner::before {
+  content: none;
+}
+
+.border-glow-inner > * {
+  position: relative;
+  z-index: 1;
+}
+
+.border-glow-card:hover,
+.border-glow-card.sweep-active {
+  border-color: rgb(255 255 255 / 22%);
+  box-shadow:
+    rgba(0, 0, 0, 0.2) 0 1px 2px,
+    rgba(0, 0, 0, 0.22) 0 12px 28px,
+    rgba(0, 0, 0, 0.32) 0 30px 88px,
+    inset 0 1px 0 rgb(255 255 255 / 12%);
+}
