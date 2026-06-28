@@ -361,7 +361,7 @@ function About() {
           <div className="portrait-meta"><Sparkles size={16} />平面视觉 / 摄影后期 / 品牌物料</div>
         </BorderGlow>
         <div className="about-copy liquid-glass reveal-block" style={{ '--stagger': '150ms' } as React.CSSProperties}>
-          <p>我是{profile.name}，英文名 {profile.englishName}，{profile.role}。具备约 4 年设计相关经验，参与过酒店活动推广、酒水品牌宣传、餐饮菜品视觉、LOGO 与 VI 基础系统等项目。</p>
+          <p>我是{profile.name}，英文名 {profile.englishName}，{profile.role}。具备约 4 年设计相关经验，主要参与酒店活动推广与餐饮视觉相关项目，能够围绕品牌调性完成画面设计、物料延展与内容呈现。</p>
           <p>我更关注设计是否能被真实使用：信息是否清楚、视觉是否统一、物料是否能顺利交付。对我来说，高级感不是复杂，而是克制、准确，并且经得起落地。</p>
           <div className="contact-list">
             <a href={'tel:' + profile.phone}><Phone size={15} />{profile.phone}</a>
