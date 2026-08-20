@@ -62,6 +62,7 @@ const projects: Project[] = [
     summary: '以餐饮消费场景为核心，完成新品、套餐与单品推广所需的主视觉和传播物料设计。',
     tone: 'green',
     images: [
+      { src: '/works/restaurant-promo/char-single-set-menu.png', alt: 'CHAR单人套餐推广海报', title: 'CHAR单人套餐', meta: '餐厅推广 / 单人套餐' },
       { src: '/works/restaurant-promo/garden-afternoon-tea.png', alt: '洲际大堂吧花园秘境下午茶推广海报', title: '花园秘境下午茶', meta: '大堂吧推广 / 餐饮视觉' },
       { src: '/works/restaurant-promo/steakhouse-poster-2.png', alt: '扒房推广海报', title: '扒房主题海报', meta: '餐厅主视觉 / 菜单推广' },
       { src: '/works/restaurant-promo/iced-coffee.png', alt: '冰咖推广海报', title: '冰咖推广海报', meta: '夏季饮品 / 单品推广' },
@@ -77,13 +78,13 @@ const projects: Project[] = [
     summary: '面向节日营销与活动传播，输出更适合酒店品牌表达的主题主视觉和活动推广画面。',
     tone: 'gold',
     images: [
+      { src: '/works/event-campaigns/intercontinental-qixi-poster.png', alt: '洲际七夕海报', title: '洲际七夕海报', meta: '七夕节点 / 节日海报' },
       { src: '/works/event-campaigns/intercontinental-mothers-day.png', alt: '洲际母亲节主题活动推广海报', title: '洲际母亲节主题海报', meta: '节日推广 / 酒店套餐' },
       { src: '/works/event-campaigns/easter-campaign.png', alt: '复活节主题活动推广海报', title: '复活节主题活动海报', meta: '亲子活动 / 节日体验' },
       { src: '/works/event-campaigns/intercontinental-valentine.png', alt: '洲际情人节主题活动推广海报', title: '洲际情人节主题海报', meta: '节日套餐 / 活动视觉' },
       { src: '/works/event-campaigns/fathers-day-banquet.png', alt: '父亲节承肩之宴主题活动海报', title: '父亲节承肩之宴', meta: '父亲节 / 餐饮活动' },
       { src: '/works/event-campaigns/teacher-appreciation-banquet.png', alt: '洲际谢师宴活动推广海报', title: '洲际谢师宴', meta: '升学宴 / 活动推广' },
       { src: '/works/event-campaigns/intercontinental-520.png', alt: '洲际520主题活动海报', title: '洲际520主题海报', meta: '520节点 / 节日推广' },
-      { src: '/works/event-campaigns/intercontinental-qixi-campaign.png', alt: '洲际七夕主题活动海报', title: '洲际七夕主题海报', meta: '七夕节点 / 活动推广' },
       { src: '/works/event-campaigns/intercontinental-halloween.png', alt: '洲际万圣节主题活动海报', title: '洲际万圣节海报', meta: '万圣节 / 节日活动' },
       { src: '/works/event-campaigns/intercontinental-womens-day.png', alt: '洲际妇女节主题活动海报', title: '洲际妇女节海报', meta: '妇女节 / 节日推广' },
     ],
@@ -121,8 +122,8 @@ const heroHighlights = [
 
 const aboutFacts = [
   { label: '工作方向', value: '酒店活动推广 / 餐饮视觉 / 品牌传播物料' },
-  { label: '相关经验', value: '4年设计相关经验，参与多个商业传播项目' },
-  { label: '核心能力', value: '海报设计 / 物料延展 / 摄影后期 / 画面执行' },
+  { label: '相关经验', value: '4年设计经验，参与多个商业传播项目' },
+  { label: '核心能力', value: '海报设计 / 物料延展 / 摄影后期' },
   { label: '常用工具', value: 'Adobe Photoshop / Illustrator / Premiere' },
 ];
 
@@ -396,7 +397,10 @@ function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void
         {projects.map((project, index) => (
             <BorderGlow
               className={'compact-project-card reveal-block tone-' + project.tone}
-              borderRadius={18}
+              borderRadius={16}
+              glowRadius={38}
+              glowIntensity={0.8}
+              fillOpacity={0.16}
               animated={false}
               key={project.title}
               role={project.images ? 'button' : undefined}
