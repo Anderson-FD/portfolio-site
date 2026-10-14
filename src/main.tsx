@@ -1,10 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowUpRight, Camera, Mail, Menu, Palette, PenTool, Phone, Sparkles, Video, X } from 'lucide-react';
+import { ArrowUpRight, Camera, Handshake, Mail, Menu, Palette, PenTool, Phone, Sparkles, X } from 'lucide-react';
 import BorderGlow from './components/BorderGlow';
 import './index.css';
 
-const BACKGROUND_VIDEO_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4';
+// 首屏背景视频。当前只有一条（"废墟花园"）；数组结构保留，方便以后恢复多条轮播。
+// 注意：换片子必须同步复核 index.css 里 .video-bg video 的 filter 与 .video-bg::after 的遮罩——
+// 一是为了画面本身好看，二是为了压在它上面的白字仍然达标（实测口径见 _portfolio-work 的对比度脚本）。
+// 原三条（平均亮度 34%–46%，属高亮抽象光效）：
+//   WATER WAVE   .../hf_20260629_030107_874273ea-684a-4e90-bb96-8fdfde48d53d.mp4
+//   GRIDWAVE     .../hf_20260629_032424_3c9c2a9d-807b-4482-80e6-dd6d9dfd4545.mp4
+//   LIGHT TUNNEL .../hf_20260627_094019_4214ea73-b963-46a4-8327-61489192de99.mp4
+const VIDEO_HOST = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/';
+const HERO_VIDEOS = [
+  { label: 'GARDEN RUIN', src: VIDEO_HOST + 'hf_20260422_112520_ee819691-f2e8-4c54-bb77-3fb72c84eaa5.mp4' },
+] as const;
+
+const coverOf = (src: string) => '/covers/' + (src.split('/').pop() ?? '').replace(/\.(png|jpe?g)$/i, '.jpg');
 
 const profile = {
   name: '冯家豪',
@@ -109,8 +121,8 @@ const projects: Project[] = [
 const strengths = [
   { icon: Palette, title: '品牌视觉表达', text: '围绕品牌调性完成海报、展板、卡券、菜单等物料设计，让视觉风格保持统一。' },
   { icon: Camera, title: '摄影后期处理', text: '熟悉产品及菜品修图、调色、抠图与合成流程，让素材更适合传播和落地。' },
-  { icon: PenTool, title: '平面物料落地', text: '理解线上传播与线下印刷差异，能输出清晰、稳定、可执行的设计文件。' },
-  { icon: Video, title: '基础视频剪辑', text: '可进行活动素材剪辑与画面整理，为推广内容补足动态视觉表达。' },
+  { icon: PenTool, title: '多场景物料延展', text: '将主视觉延展为海报、菜单、台卡及不同尺寸的宣传物料，并完成规范的完稿输出。' },
+  { icon: Handshake, title: '沟通协作与项目交付', text: '能够对接市场、运营及餐饮部门，在多项目并行和紧急节点下推进修改、定稿与交付。' },
 ];
 
 const heroHighlights = [
@@ -129,69 +141,151 @@ const aboutFacts = [
 
 const glowDefaults = {
   edgeSensitivity: 18,
-  glowColor: '46 82 86',
-  backgroundColor: '#0d0c13',
+  glowColor: '36 32 46',
+  backgroundColor: '#fffdf8',
   glowRadius: 64,
-  glowIntensity: 0.8,
+  glowIntensity: 0.5,
   coneSpread: 18,
   fillOpacity: 0.18,
-  colors: ['#f1e4c1', '#a9c6d9', '#d5d9dd'],
+  colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
 };
 
 const glowThemes = {
   portrait: {
-    glowColor: '40 78 78',
-    backgroundColor: '#111019',
-    colors: ['#f5ddb5', '#8cd5ff', '#d2b0ff'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.22,
   },
   stats: {
-    glowColor: '192 78 74',
-    backgroundColor: '#101119',
-    colors: ['#9ed8f3', '#c7e8ff', '#f1d3a2'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.2,
   },
   strengths: {
-    glowColor: '182 66 70',
-    backgroundColor: '#0d1017',
-    colors: ['#8fd3dc', '#d9c2a4', '#9db7ff'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.22,
   },
   warm: {
-    glowColor: '28 84 76',
-    backgroundColor: '#161018',
-    colors: ['#f2bf85', '#f2d7a6', '#9ad2f1'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.2,
   },
   green: {
-    glowColor: '170 66 72',
-    backgroundColor: '#0d1316',
-    colors: ['#7dcfb6', '#dce7b5', '#8fc6ff'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.2,
   },
   gold: {
-    glowColor: '42 78 78',
-    backgroundColor: '#151117',
-    colors: ['#f2d08d', '#f0b7a4', '#9bc3ff'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.22,
   },
   silver: {
-    glowColor: '210 38 80',
-    backgroundColor: '#11131a',
-    colors: ['#dbe6f4', '#b9c7da', '#f1dcc2'],
+    glowColor: '36 32 46',
+    backgroundColor: '#fffdf8',
+    colors: ['#e6d3ac', '#c9a26b', '#a8865a'],
     fillOpacity: 0.18,
   },
 } as const;
 
+function Magnet({
+  children,
+  className,
+  amplitude = 9,
+  padding = 90,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  amplitude?: number;
+  padding?: number;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let frame = 0;
+    const onMove = (event: MouseEvent) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = el.getBoundingClientRect();
+        const dx = event.clientX - (rect.left + rect.width / 2);
+        const dy = event.clientY - (rect.top + rect.height / 2);
+        const inside = Math.abs(dx) <= rect.width / 2 + padding && Math.abs(dy) <= rect.height / 2 + padding;
+        if (!inside) {
+          if (el.dataset.magnet !== 'off') { el.dataset.magnet = 'off'; el.style.transform = ''; }
+          return;
+        }
+        const k = amplitude / (Math.max(rect.width, rect.height) / 2);
+        el.dataset.magnet = 'on';
+        el.style.transform = 'translate3d(' + (dx * k).toFixed(2) + 'px, ' + (dy * k).toFixed(2) + 'px, 0)';
+      });
+    };
+    const reset = () => { el.dataset.magnet = 'off'; el.style.transform = ''; };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('blur', reset);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('blur', reset);
+    };
+  }, [amplitude, padding]);
+
+  return <div ref={ref} className={className} data-magnet="off">{children}</div>;
+}
 function App() {
   const [ready, setReady] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
+  const [activeHeroVideo, setActiveHeroVideo] = useState(0);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [activeImage, setActiveImage] = useState<WorkImage | null>(null);
 
   useEffect(() => {
+    const root = document.documentElement;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const vh = window.innerHeight;
+      const start = vh * 0.5;
+      const end = vh * 1.05;
+      const t = Math.min(1, Math.max(0, 1 - (window.scrollY - start) / (end - start)));
+      root.style.setProperty('--video-fade', t.toFixed(3));
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = window.setTimeout(() => setReady(true), 80);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // 只有一条视频时不必开轮播定时器（否则每 7s 白跑一次 setState）
+    if (HERO_VIDEOS.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveHeroVideo((index) => (index + 1) % HERO_VIDEOS.length);
+    }, 7000);
+    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -220,7 +314,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const hoverTargets = document.querySelectorAll<HTMLElement>('.primary-cta, .text-cta, .nav-pill a, .header-link, .mobile-menu-toggle, .contact-list a, .contact-actions a');
+    // 原选择器里还有 .primary-cta / .text-cta / .nav-pill a / .header-link，
+    // 那是旧版头部的元素，当前组件树里已不存在（CSS 侧同步删除了对应规则），一并移除。
+    const hoverTargets = document.querySelectorAll<HTMLElement>('.mobile-menu-toggle, .contact-list a, .contact-actions a');
     const enter = (event: Event) => (event.currentTarget as HTMLElement).classList.add('is-hovered');
     const leave = (event: Event) => (event.currentTarget as HTMLElement).classList.remove('is-hovered');
 
@@ -257,9 +353,23 @@ function App() {
   return (
     <main className="site-shell">
       <div className="video-bg" aria-hidden="true">
-        <video src={BACKGROUND_VIDEO_URL} autoPlay muted loop playsInline />
+        {/* 只给激活的一条挂 src：三条同时挂会同时下载并解码，实测首屏原本要拉 38.87MB */}
+        {HERO_VIDEOS.map((video, index) => {
+          const isActive = index === activeHeroVideo;
+          return (
+            <video
+              className={isActive ? 'is-active' : ''}
+              src={isActive ? video.src : undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="none"
+              key={video.src}
+            />
+          );
+        })}
       </div>
-      <div className="page-atmosphere" aria-hidden="true" />
       <div className="page-grain" aria-hidden="true" />
 
       <Header scrolled={navScrolled} />
@@ -277,6 +387,22 @@ function App() {
 
 function Header({ scrolled }: { scrolled: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [clock, setClock] = useState('00:00:00');
+
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Shanghai',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+    const updateClock = () => setClock(formatter.format(new Date()));
+    updateClock();
+    const timer = window.setInterval(updateClock, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     if (!menuOpen) return;
     const closeMenu = () => setMenuOpen(false);
@@ -297,12 +423,20 @@ function Header({ scrolled }: { scrolled: boolean }) {
 
   return (
     <header className={'site-header' + (scrolled ? ' is-scrolled' : '') + (menuOpen ? ' menu-open' : '')}>
-      <a href="#top" className="wordmark">Anderson</a>
-      <nav className="liquid-glass nav-pill" aria-label="主导航">
-        {navItems.map(([label, href]) => <a href={href} key={label} onClick={() => setMenuOpen(false)}>{label}</a>)}
+      <nav className="hero-nav" aria-label="主导航">
+        {navItems.map(([label, href], index) => (
+          <a className="hero-nav-link" href={href} key={label} onClick={() => setMenuOpen(false)}>
+            <small>{String(index + 1).padStart(2, '0')} /</small>
+            <span>{label}</span>
+          </a>
+        ))}
       </nav>
+      <div className="header-meta">
+        <a href={'mailto:' + profile.email}>{profile.email}</a>
+        <time dateTime={clock}>CN {clock}</time>
+      </div>
       <button
-        className="liquid-glass mobile-menu-toggle"
+        className="mobile-menu-toggle"
         type="button"
         aria-label={menuOpen ? '关闭导航' : '打开导航'}
         aria-expanded={menuOpen}
@@ -310,24 +444,27 @@ function Header({ scrolled }: { scrolled: boolean }) {
       >
         {menuOpen ? <X size={17} /> : <Menu size={17} />}
       </button>
-      <a className="liquid-glass header-link" href="#projects">先看作品</a>
     </header>
   );
 }
 
 function Hero({ readyClass }: { readyClass: string }) {
   return (
+    // 原为 'hero-section section-screen hero-theme-' + activeIndex，但 CSS 里从无 .hero-theme-* 规则，
+    // 是个从未实现的死类名，已移除。
     <section id="top" className="hero-section section-screen">
-      <div className={'hero-copy ' + readyClass}>
-        <p className="eyebrow">Anderson Portfolio 2026</p>
-        <h1>
-          <span>以克制的画面，</span>
-          <span>让品牌被准确看见。</span>
-        </h1>
-        <p className="hero-text">聚焦酒店活动推广、餐饮视觉与品牌传播物料，用清晰的信息层级和稳定的执行质感，完成可落地的视觉表达。</p>
-        <div className="hero-actions">
-          <a className="primary-cta" href="#projects">查看作品</a>
-          <a className="text-cta" href="#about">了解 Anderson <ArrowUpRight size={16} /></a>
+      <div className={'hero-layout ' + readyClass}>
+        <div className="hero-identity-row">
+          <div className="hero-title-mask">
+            <h1>
+              <span>从视觉构思到完稿交付，</span>
+              <span>让设计落到真实场景。</span>
+            </h1>
+          </div>
+          <div className="hero-intro">
+            <p>4年视觉设计相关经验，主要参与酒店活动推广、餐饮视觉及品牌宣传物料等项目，可独立完成需求梳理、版式设计、图片后期、物料延展与完稿输出。</p>
+            <a className="hero-project-cta" href="#projects">查看作品</a>
+          </div>
         </div>
       </div>
     </section>
@@ -349,14 +486,14 @@ function SectionHeading({ kicker, title, text }: { kicker: string; title: string
 function About() {
   return (
     <section id="about" className="section-block about-section">
-      <SectionHeading kicker="个人介绍" title="在商业目标与视觉质感之间，建立稳定的表达。" text="Profile" />
+      <SectionHeading kicker="个人介绍" title="不只完成画面，也关注信息是否清楚、物料能否落地。" text="Profile" />
       <div className="about-grid">
         <BorderGlow className="portrait-card reveal-block" borderRadius={28} animated {...glowDefaults} {...glowThemes.portrait} style={{ '--stagger': '90ms' } as React.CSSProperties}>
-          <div className="portrait-art portrait-photo">
+          <Magnet className="portrait-art portrait-photo" amplitude={9} padding={90}>
             <img src="/works/profile/profile-portrait.jpg" alt="Anderson 个人照片" />
             <span>Anderson</span>
             <small>Visual Designer</small>
-          </div>
+          </Magnet>
           <div className="portrait-meta"><Sparkles size={16} />平面视觉 / 摄影后期 / 品牌物料</div>
         </BorderGlow>
         <div className="about-sheet reveal-block" style={{ '--stagger': '150ms' } as React.CSSProperties}>
@@ -392,14 +529,14 @@ function About() {
 function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void }) {
   return (
     <section id="projects" className="section-block projects-section">
-      <SectionHeading kicker="作品展示" title="精选案例与项目方向" text="Selected Works" />
+      <SectionHeading kicker="作品展示" title="真实项目中的视觉判断与执行" text="Selected Works" />
       <div className="compact-project-grid">
         {projects.map((project, index) => (
             <BorderGlow
               className={'compact-project-card reveal-block tone-' + project.tone}
               borderRadius={16}
               glowRadius={38}
-              glowIntensity={0.8}
+              glowIntensity={0.5}
               fillOpacity={0.16}
               animated={false}
               key={project.title}
@@ -419,7 +556,7 @@ function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void
               style={{ '--stagger': `${index * 90}ms` } as React.CSSProperties}
             >
               <div className="compact-project-visual">
-                <img src={project.images?.[0]?.src} alt={project.images?.[0]?.alt} loading="lazy" />
+                <img src={project.images?.[0] ? coverOf(project.images[0].src) : undefined} alt={project.images?.[0]?.alt} loading="lazy" />
               </div>
               <div className="compact-project-head">
                 <div>
@@ -503,7 +640,7 @@ function WorkGallery({ project, activeImage, onClose, onOpenImage, onCloseImage 
 function Strengths() {
   return (
     <section id="strengths" className="section-block strengths-section">
-      <SectionHeading kicker="个人优势" title="把审美、执行和沟通放在同一个工作流里。" text="Capability" />
+      <SectionHeading kicker="个人优势" title="从需求理解到文件交付，独立推进完整设计流程。" text="Capability" />
       <div className="strength-grid">
         {strengths.map((item, index) => {
           const Icon = item.icon;
@@ -529,7 +666,7 @@ function Contact() {
             <p>联系信息</p>
             <span>Contact</span>
           </div>
-          <h2>如果你希望继续聊作品、项目或岗位机会，我们可以直接开始。</h2>
+          <h2>如果我的经验与你们正在寻找的方向匹配，欢迎与我联系。</h2>
           <p className="contact-text">手机号、邮箱和微信都保留在这里，方便你选择更顺手的方式联系我。</p>
           <div className="contact-actions">
             <a className="liquid-glass" href={'tel:' + profile.phone}><Phone size={16} />{profile.phone}</a>
@@ -541,10 +678,15 @@ function Contact() {
             <img src="/assets/wechat-qr-black.png" alt="Anderson 微信二维码" />
           </div>
           <div className="contact-qr-meta">
-            <strong>微信联系</strong>
-            <span>扫码添加微信，进一步沟通作品与合作。</span>
+            <strong>微信沟通</strong>
+            <span>扫码添加微信，进一步沟通岗位与作品。</span>
           </div>
         </div>
+      </div>
+      <div className="contact-footer reveal-block">
+        <span className="contact-footer-name">Anderson</span>
+        <span className="contact-footer-note">平面视觉设计 · 摄影后期 · 品牌与活动物料</span>
+        <a className="contact-footer-top" href="#top">回到顶部 <ArrowUpRight size={13} /></a>
       </div>
     </section>
   );

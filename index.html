@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Anderson | 视觉设计师作品集</title>
+
+    <!--
+      字体加载：用 <link> + preconnect 替代原先写在 index.css 里的 @import。
+      @import 的链路是串行的：先下 CSS → 才发现 import → 再下 → 才发现字体文件。
+      放到这里浏览器可并行发现，并提前建连。
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Bodoni+Moda:ital,opsz,wght@1,6..96,500&family=Figtree:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+    />
   </head>
   <body>
     <div id="root"></div>
