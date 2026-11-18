@@ -42,10 +42,11 @@ type Project = {
   scope: string;
   summary: string;
   tone: string;
+  hidden?: boolean;
   images?: WorkImage[];
 };
 
-const projects: Project[] = [
+const allProjects: Project[] = [
   {
     title: '节日与节气海报',
     type: 'Seasonal Posters',
@@ -128,11 +129,15 @@ const projects: Project[] = [
     ],
   },
   {
+    /* 现挂起。整个 entry 原样留着，把 hidden 去掉就回到作品区，
+       不用重写数据。折页、计数器、整组弹层都从下面那个过滤后的 projects 读，
+       所以 4 张卡和 04/04 的编号会自己跟上，别处不用改。 */
     title: '摄影作品',
     type: 'Photography',
     scope: '风景摄影 / 菜品拍摄 / 空间与产品记录',
     summary: '记录空间、菜品与场景细节，补足视觉传播中对素材质感、光线控制和画面完整度的要求。',
     tone: 'silver',
+    hidden: true,
     images: [
       { src: '/works/photography/landscape-photo.jpg', alt: '风景摄影作品', title: '', meta: '' },
       { src: '/works/photography/dessert-photo-2.png', alt: '甜品摄影作品二', title: '', meta: '' },
@@ -143,6 +148,10 @@ const projects: Project[] = [
     ],
   },
 ];
+
+/* 作品区只读这一份。带 hidden 的组还留在上面，只是不进列表——
+   删数据容易，想加回来要重录一遍，所以挂起而不是删除。 */
+const projects = allProjects.filter((project) => !project.hidden);
 
 const strengths = [
   { icon: Palette, title: '品牌视觉表达', text: '围绕品牌调性完成海报、展板、卡券、菜单等物料设计，让视觉风格保持统一。' },
