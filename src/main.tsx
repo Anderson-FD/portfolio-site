@@ -19,7 +19,10 @@ const HERO_VIDEOS = [
   { label: 'GARDEN RUIN', src: VIDEO_HOST + 'hf_20260422_112520_ee819691-f2e8-4c54-bb77-3fb72c84eaa5.mp4' },
 ] as const;
 
-const coverOf = (src: string) => '/covers/' + (src.split('/').pop() ?? '').replace(/\.(png|jpe?g)$/i, '.jpg');
+/* 封面统一是 /covers/xxx.jpg（能取 4:3 的裁切，原图是竖版长图）。
+   作品原图已经从 png/jpg 换成 webp，这个正则必须认 webp，
+   否则会推出 /covers/xxx.webp 这种不存在的地址。 */
+const coverOf = (src: string) => '/covers/' + (src.split('/').pop() ?? '').replace(/\.(png|jpe?g|webp)$/i, '.jpg');
 
 const profile = {
   name: '冯家豪',
@@ -54,21 +57,21 @@ const allProjects: Project[] = [
     summary: '围绕节日节点与节气主题，建立兼顾品牌问候、画面情绪与传播效率的一组海报系统。',
     tone: 'warm',
     images: [
-      { src: '/works/seasonal-posters/intercontinental-summer-solstice.png', alt: '洲际夏至节气海报', title: '洲际夏至节气海报', meta: '二十四节气 / 品牌问候' },
-      { src: '/works/seasonal-posters/dragon-boat-concept.png', alt: '端午节概念海报', title: '端午节概念海报', meta: '传统节日 / 概念视觉' },
-      { src: '/works/seasonal-posters/childrens-day-concept.png', alt: '儿童节概念海报', title: '儿童节概念海报', meta: '节日海报 / 概念视觉' },
-      { src: '/works/seasonal-posters/intercontinental-grain-in-ear.png', alt: '洲际芒种节气海报', title: '洲际芒种节气海报', meta: '二十四节气 / 品牌海报' },
-      { src: '/works/seasonal-posters/holiday-grain-in-ear.png', alt: '假日芒种节气海报', title: '假日芒种节气海报', meta: '二十四节气 / 品牌海报' },
-      { src: '/works/seasonal-posters/intercontinental-grain-buds.png', alt: '洲际小满节气海报', title: '洲际小满节气海报', meta: '二十四节气 / 节气主题' },
-      { src: '/works/seasonal-posters/intercontinental-start-of-summer.png', alt: '洲际立夏节气海报', title: '洲际立夏节气海报', meta: '二十四节气 / 节气主题' },
-      { src: '/works/seasonal-posters/intercontinental-major-cold.png', alt: '洲际大寒节气海报', title: '洲际大寒节气海报', meta: '二十四节气 / 冬日主题' },
-      { src: '/works/seasonal-posters/intercontinental-winter-solstice.png', alt: '洲际冬至节气海报', title: '洲际冬至节气海报', meta: '二十四节气 / 冬至主题' },
-      { src: '/works/seasonal-posters/intercontinental-qixi.png', alt: '洲际七夕节海报', title: '洲际七夕节海报', meta: '传统节日 / 节日海报' },
-      { src: '/works/seasonal-posters/intercontinental-national-day.png', alt: '洲际国庆海报', title: '洲际国庆海报', meta: '国庆节 / 节日海报' },
-      { src: '/works/seasonal-posters/intercontinental-mid-autumn.png', alt: '洲际中秋海报', title: '洲际中秋海报', meta: '中秋节 / 节日海报' },
-      { src: '/works/seasonal-posters/intercontinental-double-ninth.png', alt: '洲际重阳节海报', title: '洲际重阳节海报', meta: '重阳节 / 节日海报' },
-      { src: '/works/seasonal-posters/concept-520.png', alt: '520概念海报', title: '520概念海报', meta: '节日节点 / 概念视觉' },
-      { src: '/works/seasonal-posters/concept-valentine.png', alt: '情人节概念海报', title: '情人节概念海报', meta: '节日节点 / 概念视觉' },
+      { src: '/works/seasonal-posters/intercontinental-summer-solstice.webp', alt: '洲际夏至节气海报', title: '洲际夏至节气海报', meta: '二十四节气 / 品牌问候' },
+      { src: '/works/seasonal-posters/dragon-boat-concept.webp', alt: '端午节概念海报', title: '端午节概念海报', meta: '传统节日 / 概念视觉' },
+      { src: '/works/seasonal-posters/childrens-day-concept.webp', alt: '儿童节概念海报', title: '儿童节概念海报', meta: '节日海报 / 概念视觉' },
+      { src: '/works/seasonal-posters/intercontinental-grain-in-ear.webp', alt: '洲际芒种节气海报', title: '洲际芒种节气海报', meta: '二十四节气 / 品牌海报' },
+      { src: '/works/seasonal-posters/holiday-grain-in-ear.webp', alt: '假日芒种节气海报', title: '假日芒种节气海报', meta: '二十四节气 / 品牌海报' },
+      { src: '/works/seasonal-posters/intercontinental-grain-buds.webp', alt: '洲际小满节气海报', title: '洲际小满节气海报', meta: '二十四节气 / 节气主题' },
+      { src: '/works/seasonal-posters/intercontinental-start-of-summer.webp', alt: '洲际立夏节气海报', title: '洲际立夏节气海报', meta: '二十四节气 / 节气主题' },
+      { src: '/works/seasonal-posters/intercontinental-major-cold.webp', alt: '洲际大寒节气海报', title: '洲际大寒节气海报', meta: '二十四节气 / 冬日主题' },
+      { src: '/works/seasonal-posters/intercontinental-winter-solstice.webp', alt: '洲际冬至节气海报', title: '洲际冬至节气海报', meta: '二十四节气 / 冬至主题' },
+      { src: '/works/seasonal-posters/intercontinental-qixi.webp', alt: '洲际七夕节海报', title: '洲际七夕节海报', meta: '传统节日 / 节日海报' },
+      { src: '/works/seasonal-posters/intercontinental-national-day.webp', alt: '洲际国庆海报', title: '洲际国庆海报', meta: '国庆节 / 节日海报' },
+      { src: '/works/seasonal-posters/intercontinental-mid-autumn.webp', alt: '洲际中秋海报', title: '洲际中秋海报', meta: '中秋节 / 节日海报' },
+      { src: '/works/seasonal-posters/intercontinental-double-ninth.webp', alt: '洲际重阳节海报', title: '洲际重阳节海报', meta: '重阳节 / 节日海报' },
+      { src: '/works/seasonal-posters/concept-520.webp', alt: '520概念海报', title: '520概念海报', meta: '节日节点 / 概念视觉' },
+      { src: '/works/seasonal-posters/concept-valentine.webp', alt: '情人节概念海报', title: '情人节概念海报', meta: '节日节点 / 概念视觉' },
     ],
   },
   {
@@ -78,13 +81,13 @@ const allProjects: Project[] = [
     summary: '以餐饮消费场景为核心，完成新品、套餐与单品推广所需的主视觉和传播物料设计。',
     tone: 'green',
     images: [
-      { src: '/works/restaurant-promo/char-single-set-menu.png', alt: 'CHAR单人套餐推广海报', title: 'CHAR单人套餐', meta: '餐厅推广 / 单人套餐' },
-      { src: '/works/restaurant-promo/garden-afternoon-tea.png', alt: '洲际大堂吧花园秘境下午茶推广海报', title: '花园秘境下午茶', meta: '大堂吧推广 / 餐饮视觉' },
-      { src: '/works/restaurant-promo/steakhouse-poster-2.png', alt: '扒房推广海报', title: '扒房主题海报', meta: '餐厅主视觉 / 菜单推广' },
-      { src: '/works/restaurant-promo/iced-coffee.png', alt: '冰咖推广海报', title: '冰咖推广海报', meta: '夏季饮品 / 单品推广' },
-      { src: '/works/restaurant-promo/oriental-afternoon-tea.png', alt: '国风双人下午茶推广海报', title: '国风双人下午茶', meta: '下午茶套餐 / 餐饮推广' },
-      { src: '/works/restaurant-promo/winter-brews.png', alt: '暖冬饮萃推广海报', title: '暖冬饮萃', meta: '冬季饮品 / 节令推广' },
-      { src: '/works/restaurant-promo/autumn-encounter.png', alt: '邂逅金秋推广海报', title: '邂逅金秋', meta: '秋季主题 / 餐饮推广' },
+      { src: '/works/restaurant-promo/char-single-set-menu.webp', alt: 'CHAR单人套餐推广海报', title: 'CHAR单人套餐', meta: '餐厅推广 / 单人套餐' },
+      { src: '/works/restaurant-promo/garden-afternoon-tea.webp', alt: '洲际大堂吧花园秘境下午茶推广海报', title: '花园秘境下午茶', meta: '大堂吧推广 / 餐饮视觉' },
+      { src: '/works/restaurant-promo/steakhouse-poster-2.webp', alt: '扒房推广海报', title: '扒房主题海报', meta: '餐厅主视觉 / 菜单推广' },
+      { src: '/works/restaurant-promo/iced-coffee.webp', alt: '冰咖推广海报', title: '冰咖推广海报', meta: '夏季饮品 / 单品推广' },
+      { src: '/works/restaurant-promo/oriental-afternoon-tea.webp', alt: '国风双人下午茶推广海报', title: '国风双人下午茶', meta: '下午茶套餐 / 餐饮推广' },
+      { src: '/works/restaurant-promo/winter-brews.webp', alt: '暖冬饮萃推广海报', title: '暖冬饮萃', meta: '冬季饮品 / 节令推广' },
+      { src: '/works/restaurant-promo/autumn-encounter.webp', alt: '邂逅金秋推广海报', title: '邂逅金秋', meta: '秋季主题 / 餐饮推广' },
     ],
   },
   {
@@ -94,15 +97,15 @@ const allProjects: Project[] = [
     summary: '面向节日营销与活动传播，输出更适合酒店品牌表达的主题主视觉和活动推广画面。',
     tone: 'gold',
     images: [
-      { src: '/works/event-campaigns/intercontinental-qixi-poster.png', alt: '洲际七夕海报', title: '洲际七夕海报', meta: '七夕节点 / 节日海报' },
-      { src: '/works/event-campaigns/intercontinental-mothers-day.png', alt: '洲际母亲节主题活动推广海报', title: '洲际母亲节主题海报', meta: '节日推广 / 酒店套餐' },
-      { src: '/works/event-campaigns/easter-campaign.png', alt: '复活节主题活动推广海报', title: '复活节主题活动海报', meta: '亲子活动 / 节日体验' },
-      { src: '/works/event-campaigns/intercontinental-valentine.png', alt: '洲际情人节主题活动推广海报', title: '洲际情人节主题海报', meta: '节日套餐 / 活动视觉' },
-      { src: '/works/event-campaigns/fathers-day-banquet.png', alt: '父亲节承肩之宴主题活动海报', title: '父亲节承肩之宴', meta: '父亲节 / 餐饮活动' },
-      { src: '/works/event-campaigns/teacher-appreciation-banquet.png', alt: '洲际谢师宴活动推广海报', title: '洲际谢师宴', meta: '升学宴 / 活动推广' },
-      { src: '/works/event-campaigns/intercontinental-520.png', alt: '洲际520主题活动海报', title: '洲际520主题海报', meta: '520节点 / 节日推广' },
-      { src: '/works/event-campaigns/intercontinental-halloween.png', alt: '洲际万圣节主题活动海报', title: '洲际万圣节海报', meta: '万圣节 / 节日活动' },
-      { src: '/works/event-campaigns/intercontinental-womens-day.png', alt: '洲际妇女节主题活动海报', title: '洲际妇女节海报', meta: '妇女节 / 节日推广' },
+      { src: '/works/event-campaigns/intercontinental-qixi-poster.webp', alt: '洲际七夕海报', title: '洲际七夕海报', meta: '七夕节点 / 节日海报' },
+      { src: '/works/event-campaigns/intercontinental-mothers-day.webp', alt: '洲际母亲节主题活动推广海报', title: '洲际母亲节主题海报', meta: '节日推广 / 酒店套餐' },
+      { src: '/works/event-campaigns/easter-campaign.webp', alt: '复活节主题活动推广海报', title: '复活节主题活动海报', meta: '亲子活动 / 节日体验' },
+      { src: '/works/event-campaigns/intercontinental-valentine.webp', alt: '洲际情人节主题活动推广海报', title: '洲际情人节主题海报', meta: '节日套餐 / 活动视觉' },
+      { src: '/works/event-campaigns/fathers-day-banquet.webp', alt: '父亲节承肩之宴主题活动海报', title: '父亲节承肩之宴', meta: '父亲节 / 餐饮活动' },
+      { src: '/works/event-campaigns/teacher-appreciation-banquet.webp', alt: '洲际谢师宴活动推广海报', title: '洲际谢师宴', meta: '升学宴 / 活动推广' },
+      { src: '/works/event-campaigns/intercontinental-520.webp', alt: '洲际520主题活动海报', title: '洲际520主题海报', meta: '520节点 / 节日推广' },
+      { src: '/works/event-campaigns/intercontinental-halloween.webp', alt: '洲际万圣节主题活动海报', title: '洲际万圣节海报', meta: '万圣节 / 节日活动' },
+      { src: '/works/event-campaigns/intercontinental-womens-day.webp', alt: '洲际妇女节主题活动海报', title: '洲际妇女节海报', meta: '妇女节 / 节日推广' },
     ],
   },
   {
@@ -118,14 +121,14 @@ const allProjects: Project[] = [
     summary: '没有委托方的自命题海报。题材从神话塑像、王权肖像延伸到建筑与山野，重心放在图像、字体与版式之间的关系。',
     tone: 'ink',
     images: [
-      { src: '/works/self-initiated/hour-keeper.png', alt: '流沙之身概念海报', title: '流沙之身', meta: '无形之神 01 / 时间' },
-      { src: '/works/self-initiated/memory-palace.png', alt: '记忆宫殿概念海报', title: '记忆宫殿', meta: '无形之神 02 / 记忆' },
-      { src: '/works/self-initiated/gilded-hunger.png', alt: '鎏金之欲概念海报', title: '鎏金之欲', meta: '无形之神 03 / 欲望' },
-      { src: '/works/self-initiated/sleeping-sky.png', alt: '眠于群星概念海报', title: '眠于群星', meta: '无形之神 04 / 梦境' },
-      { src: '/works/self-initiated/crown-of-iron.png', alt: '国王铁誓概念海报', title: '铁誓 · 之王', meta: '王冠之重 I / 王权' },
-      { src: '/works/self-initiated/crown-of-silence.png', alt: '王后缄默概念海报', title: '缄默 · 王后', meta: '王冠之重 II / 王权' },
-      { src: '/works/self-initiated/passages-of-a-year.png', alt: '山有四季概念海报', title: '山有四季', meta: '风景研究 / 四季' },
-      { src: '/works/self-initiated/between-angles.png', alt: '折光概念海报', title: '折光', meta: '空间研究 / 建筑与光' },
+      { src: '/works/self-initiated/hour-keeper.webp', alt: '流沙之身概念海报', title: '流沙之身', meta: '无形之神 01 / 时间' },
+      { src: '/works/self-initiated/memory-palace.webp', alt: '记忆宫殿概念海报', title: '记忆宫殿', meta: '无形之神 02 / 记忆' },
+      { src: '/works/self-initiated/gilded-hunger.webp', alt: '鎏金之欲概念海报', title: '鎏金之欲', meta: '无形之神 03 / 欲望' },
+      { src: '/works/self-initiated/sleeping-sky.webp', alt: '眠于群星概念海报', title: '眠于群星', meta: '无形之神 04 / 梦境' },
+      { src: '/works/self-initiated/crown-of-iron.webp', alt: '国王铁誓概念海报', title: '铁誓 · 之王', meta: '王冠之重 I / 王权' },
+      { src: '/works/self-initiated/crown-of-silence.webp', alt: '王后缄默概念海报', title: '缄默 · 王后', meta: '王冠之重 II / 王权' },
+      { src: '/works/self-initiated/passages-of-a-year.webp', alt: '山有四季概念海报', title: '山有四季', meta: '风景研究 / 四季' },
+      { src: '/works/self-initiated/between-angles.webp', alt: '折光概念海报', title: '折光', meta: '空间研究 / 建筑与光' },
     ],
   },
   {
@@ -139,12 +142,12 @@ const allProjects: Project[] = [
     tone: 'silver',
     hidden: true,
     images: [
-      { src: '/works/photography/landscape-photo.jpg', alt: '风景摄影作品', title: '', meta: '' },
-      { src: '/works/photography/dessert-photo-2.png', alt: '甜品摄影作品二', title: '', meta: '' },
-      { src: '/works/photography/dessert-photo-1.png', alt: '甜品摄影作品一', title: '', meta: '' },
-      { src: '/works/photography/dish-photo-1.png', alt: '菜品摄影作品一', title: '', meta: '' },
-      { src: '/works/photography/dish-photo-2.png', alt: '菜品摄影作品二', title: '', meta: '' },
-      { src: '/works/photography/dish-photo-3.png', alt: '菜品摄影作品三', title: '', meta: '' },
+      { src: '/works/photography/landscape-photo.webp', alt: '风景摄影作品', title: '', meta: '' },
+      { src: '/works/photography/dessert-photo-2.webp', alt: '甜品摄影作品二', title: '', meta: '' },
+      { src: '/works/photography/dessert-photo-1.webp', alt: '甜品摄影作品一', title: '', meta: '' },
+      { src: '/works/photography/dish-photo-1.webp', alt: '菜品摄影作品一', title: '', meta: '' },
+      { src: '/works/photography/dish-photo-2.webp', alt: '菜品摄影作品二', title: '', meta: '' },
+      { src: '/works/photography/dish-photo-3.webp', alt: '菜品摄影作品三', title: '', meta: '' },
     ],
   },
 ];
@@ -572,7 +575,7 @@ function About() {
         <div className="about-idcard reveal-block" ref={idcardRef} style={{ '--stagger': '90ms' } as React.CSSProperties}>
           {idcardReady && (
             <ProfileCard
-              avatarUrl="/works/profile/profile-portrait.jpg"
+              avatarUrl="/works/profile/profile-portrait.webp"
               name="Anderson"
               title="Visual Designer"
               /* handle 必须显式传空：它的默认值是占位的 @javicodes，不传就会印在卡上。 */
@@ -633,7 +636,10 @@ function Works({ onOpen }: { onOpen: (project: Project, image: WorkImage) => voi
   const items = useMemo(
     () =>
       projects.map(project => ({
-        image: '/covers/' + ((project.images?.[0]?.src ?? '').split('/').pop() ?? '').replace(/\.(png|jpe?g)$/i, '.jpg'),
+        /* 原来这里把 coverOf 的规则又抄了一遍（只认 png/jpg）。原图换成 webp 之后
+           这一份没跟着改，封面地址就成了 /covers/xxx.webp——404。
+           现在直接调 coverOf，只剩一处规则。 */
+        image: coverOf(project.images?.[0]?.src ?? ''),
         label: project.title,
         alt: project.title,
       })),
@@ -755,7 +761,16 @@ function WorkGallery({ project, activeImage, onClose, onOpenImage, onCloseImage 
               aria-label={'放大查看' + (image.title || image.alt)}
             >
               <div className="gallery-poster-media">
-                <img src={image.src} alt={image.alt} />
+                {/* lazy：整组一打开就是 15 张全下，一屏只看得到八九张，
+                    剩下的等滚到再拉。配上 webp（每组从 40MB 级降到 2MB 级），
+                    这一下就是原来慢的主因。前两张给 high，它们是进组第一眼。 */}
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  fetchPriority={index < 2 ? 'high' : 'auto'}
+                  decoding="async"
+                />
               </div>
               <span>{String(index + 1).padStart(2, '0')}</span>
               <div className="gallery-poster-caption">
@@ -781,7 +796,7 @@ function WorkGallery({ project, activeImage, onClose, onOpenImage, onCloseImage 
               </button>
             )}
             <figure className="lightbox-frame">
-              <img src={activeImage.src} alt={activeImage.alt} />
+              <img src={activeImage.src} alt={activeImage.alt} decoding="async" fetchPriority="high" />
               <figcaption>
                 <strong>{activeImage.title}</strong>
                 <span>{activeImage.meta}</span>
