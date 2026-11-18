@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowUpRight, Camera, Handshake, Mail, Menu, Palette, PenTool, Phone, Sparkles, X } from 'lucide-react';
-import BorderGlow from './components/BorderGlow';
+import { ArrowUpRight, Camera, ChevronLeft, ChevronRight, Handshake, Mail, Menu, Palette, PenTool, Phone, Sparkles, X } from 'lucide-react';
+/* 名片换成 ProfileCard 之后，BorderGlow 在这个站里就没有使用处了，导入一并去掉
+   （组件文件还在 components/ 里，想回到那版直接接回来即可）。 */
+import AccordionGallery from './components/AccordionGallery';
+import ProfileCard from './components/ProfileCard';
 import './index.css';
 
 // 首屏背景视频。当前只有一条（"废墟花园"）；数组结构保留，方便以后恢复多条轮播。
@@ -99,6 +102,29 @@ const projects: Project[] = [
       { src: '/works/event-campaigns/intercontinental-520.png', alt: '洲际520主题活动海报', title: '洲际520主题海报', meta: '520节点 / 节日推广' },
       { src: '/works/event-campaigns/intercontinental-halloween.png', alt: '洲际万圣节主题活动海报', title: '洲际万圣节海报', meta: '万圣节 / 节日活动' },
       { src: '/works/event-campaigns/intercontinental-womens-day.png', alt: '洲际妇女节主题活动海报', title: '洲际妇女节海报', meta: '妇女节 / 节日推广' },
+    ],
+  },
+  {
+    /* 这一组没有甲方：题目是自己出的，所以卡片名不按"什么活"取，按"什么性质"取。
+       上面四张卡都是接来的活（节日 / 餐厅 / 活动 / 摄影），这张是自命题，
+       叫「个人创作」一眼就能跟前面四张区分开。
+       八个文件其实是三个系列：「无形之神」四张（01 时间 / 02 记忆 / 03 欲望 / 04 梦境）、
+       「王冠之重」两张（I 之王 / II 王后）、另外山野和建筑各一张。
+       系列顺序照原海报上的编号排，没按视觉强弱重排。 */
+    title: '个人创作',
+    type: 'Self-Initiated',
+    scope: '概念海报 / 神话与王权 / 空间与自然',
+    summary: '没有委托方的自命题海报。题材从神话塑像、王权肖像延伸到建筑与山野，重心放在图像、字体与版式之间的关系。',
+    tone: 'ink',
+    images: [
+      { src: '/works/self-initiated/hour-keeper.png', alt: '流沙之身概念海报', title: '流沙之身', meta: '无形之神 01 / 时间' },
+      { src: '/works/self-initiated/memory-palace.png', alt: '记忆宫殿概念海报', title: '记忆宫殿', meta: '无形之神 02 / 记忆' },
+      { src: '/works/self-initiated/gilded-hunger.png', alt: '鎏金之欲概念海报', title: '鎏金之欲', meta: '无形之神 03 / 欲望' },
+      { src: '/works/self-initiated/sleeping-sky.png', alt: '眠于群星概念海报', title: '眠于群星', meta: '无形之神 04 / 梦境' },
+      { src: '/works/self-initiated/crown-of-iron.png', alt: '国王铁誓概念海报', title: '铁誓 · 之王', meta: '王冠之重 I / 王权' },
+      { src: '/works/self-initiated/crown-of-silence.png', alt: '王后缄默概念海报', title: '缄默 · 王后', meta: '王冠之重 II / 王权' },
+      { src: '/works/self-initiated/passages-of-a-year.png', alt: '山有四季概念海报', title: '山有四季', meta: '风景研究 / 四季' },
+      { src: '/works/self-initiated/between-angles.png', alt: '折光概念海报', title: '折光', meta: '空间研究 / 建筑与光' },
     ],
   },
   {
@@ -341,9 +367,20 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      if (activeImage) setActiveImage(null);
-      else if (activeProject) setActiveProject(null);
+      if (event.key === 'Escape') {
+        if (activeImage) setActiveImage(null);
+        else if (activeProject) setActiveProject(null);
+        return;
+      }
+      /* 海报放大状态下左右键翻页。跟弹层里那两个箭头按钮同一套逻辑（含头尾相接），
+         只是键盘更快：一份作品动辄十几二十张，用鼠标点箭头要挪很远。 */
+      if (!activeImage || !activeProject?.images?.length) return;
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      const list = activeProject.images;
+      const at = list.findIndex((item) => item.src === activeImage.src);
+      if (at < 0) return;
+      event.preventDefault();
+      setActiveImage(list[(at + (event.key === 'ArrowRight' ? 1 : -1) + list.length) % list.length]);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -376,7 +413,12 @@ function App() {
       <Hero readyClass={ready ? 'is-ready' : ''} />
       <div className="front-sequence">
         <About />
-        <Projects onOpenProject={setActiveProject} />
+        <Works
+          onOpen={(project, image) => {
+            setActiveProject(project);
+            setActiveImage(image);
+          }}
+        />
       </div>
       <Strengths />
       <Contact />
@@ -454,11 +496,14 @@ function Hero({ readyClass }: { readyClass: string }) {
     // 是个从未实现的死类名，已移除。
     <section id="top" className="hero-section section-screen">
       <div className={'hero-layout ' + readyClass}>
+        {/* 标题和说明原来是左右两栏：大字在两列之外，右边那段小字自成一块，
+            左边线各对各的，看完标题视线要往右上跳。现在改成同一列往下排，
+            标题 / 说明 / 按钮共用一条左边缘。 */}
         <div className="hero-identity-row">
           <div className="hero-title-mask">
             <h1>
-              <span>从视觉构思到完稿交付，</span>
-              <span>让设计落到真实场景。</span>
+              <span>为品牌塑造视觉，</span>
+              <span>为场景增添质感。</span>
             </h1>
           </div>
           <div className="hero-intro">
@@ -471,31 +516,74 @@ function Hero({ readyClass }: { readyClass: string }) {
   );
 }
 
-function SectionHeading({ kicker, title, text }: { kicker: string; title: string; text?: string }) {
+/* 板块标题组。
+   原来是反的：把「一句长话」当 h2、把「个人介绍」压成 14px+字距的眉标。
+   语义上「个人介绍」才是板块名，长句是它的说明；视觉上却反过来，
+   读者先读到一句观点，认不出这是哪一块。而且那个 14px/600 的标签，
+   比正文（13px）还大还粗，caption 压过了 body。
+   现在：h2 = 板块名，长句 = 16px 的一句说明，英文名缩到板块名右侧同一基线上。 */
+function SectionHeading({ name, latin, lead }: { name: string; latin?: string; lead?: string }) {
   return (
     <div className="section-heading reveal-block">
       <div className="section-heading-meta">
-        <p>{kicker}</p>
-        {text && <span>{text}</span>}
+        <h2>{name}</h2>
+        {latin && <span>{latin}</span>}
       </div>
-      <h2>{title}</h2>
+      {lead && <p className="section-heading-lead">{lead}</p>}
     </div>
   );
 }
 
 function About() {
+  /* 名片换成了 React Bits 的 ProfileCard（倾斜 + 全息箔 + 跟随光标的高光）。
+     它的 intro 是「出现时扫一次光」，只在挂载那一刻播。
+     这张卡在首屏之下，直接挂上来这束光会在屏幕外面放完，等滚到这儿只剩一张静止的卡。
+     所以等它进视口再挂——同一时刻 reveal-block 的淡入也才开始，两下叠在一起才算进场。
+     （占位不用留高度：这一行的高度由右边那张介绍卡撑着，名片挂上来不会顶动它。） */
+  const [idcardReady, setIdcardReady] = useState(false);
+  const idcardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (idcardReady) return;
+    const el = idcardRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) setIdcardReady(true);
+      },
+      { rootMargin: '0px 0px -18% 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [idcardReady]);
+
   return (
     <section id="about" className="section-block about-section">
-      <SectionHeading kicker="个人介绍" title="不只完成画面，也关注信息是否清楚、物料能否落地。" text="Profile" />
+      <SectionHeading name="个人介绍" latin="Profile" lead="不只完成画面，也关注信息是否清楚、物料能否落地。" />
       <div className="about-grid">
-        <BorderGlow className="portrait-card reveal-block" borderRadius={28} animated {...glowDefaults} {...glowThemes.portrait} style={{ '--stagger': '90ms' } as React.CSSProperties}>
-          <Magnet className="portrait-art portrait-photo" amplitude={9} padding={90}>
-            <img src="/works/profile/profile-portrait.jpg" alt="Anderson 个人照片" />
-            <span>Anderson</span>
-            <small>Visual Designer</small>
-          </Magnet>
-          <div className="portrait-meta"><Sparkles size={16} />平面视觉 / 摄影后期 / 品牌物料</div>
-        </BorderGlow>
+        <div className="about-idcard reveal-block" ref={idcardRef} style={{ '--stagger': '90ms' } as React.CSSProperties}>
+          {idcardReady && (
+            <ProfileCard
+              avatarUrl="/works/profile/profile-portrait.jpg"
+              name="Anderson"
+              title="Visual Designer"
+              /* handle 必须显式传空：它的默认值是占位的 @javicodes，不传就会印在卡上。 */
+              handle=""
+              status="平面视觉 / 摄影后期 / 品牌物料"
+              statusColor="#9a7b4f"
+              contactText="联系我"
+              onContactClick={() => document.getElementById('contact')?.scrollIntoView({ block: 'start' })}
+              theme="light"
+              radius={15}
+              /* 全息箔在这张浅色照片上走 multiply，铺满整块图时会把亮部压暗、显脏。
+                 0.6 是「动起来能看见、停住不脏」的位置；真要更明显得给它配一张
+                 iconUrl 图案（箔只从图案里透出来），那是另一个设计决定了。 */
+              holo={0.6}
+              glare={0.5}
+              tiltStrength={10}
+              parallax={10}
+            />
+          )}
+        </div>
         <div className="about-sheet reveal-block" style={{ '--stagger': '150ms' } as React.CSSProperties}>
           <div className="about-sheet-head">
             <div className="about-sheet-title">
@@ -526,51 +614,87 @@ function About() {
   );
 }
 
-function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void }) {
+/* 作品区：四组分类各一张封面，横向折页（AccordionGallery / GSAP）。
+   前一版是居中一张 960 宽的画框，标题左对齐、画框居中，左右留白对不上；
+   这一版整块跟标题的下边线同宽，四张卡平铺满，到边到角都是齐的。
+
+   图用 covers/ 那批 1200×900 宽版——它跟作品原图（1080×2340 竖版）
+   是两套构图，宽版是专门排过的，内容落在纵向 18%–86%，所以卡片做扁做方都不切内容。 */
+function Works({ onOpen }: { onOpen: (project: Project, image: WorkImage) => void }) {
+  const items = useMemo(
+    () =>
+      projects.map(project => ({
+        image: '/covers/' + ((project.images?.[0]?.src ?? '').split('/').pop() ?? '').replace(/\.(png|jpe?g)$/i, '.jpg'),
+        label: project.title,
+        alt: project.title,
+      })),
+    [],
+  );
+
+  /* 窄屏横着切四片会只剩几十像素宽，什么都看不出来。760 以下改成竖折——
+     组件自带的 520 断点会把列布局拍平成等高列表（height:auto 时 flexGrow 不生效，
+     展开那张撑不开），所以那边不用它的断点，改成这里的定高竖折。 */
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 760px)');
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  const [current, setCurrent] = useState(0);
+  const openProject = (index: number) => {
+    const project = projects[index];
+    const image = project?.images?.[0];
+    if (project && image) onOpen(project, image);
+  };
+
   return (
     <section id="projects" className="section-block projects-section">
-      <SectionHeading kicker="作品展示" title="真实项目中的视觉判断与执行" text="Selected Works" />
-      <div className="compact-project-grid">
-        {projects.map((project, index) => (
-            <BorderGlow
-              className={'compact-project-card reveal-block tone-' + project.tone}
-              borderRadius={16}
-              glowRadius={38}
-              glowIntensity={0.5}
-              fillOpacity={0.16}
-              animated={false}
-              key={project.title}
-              role={project.images ? 'button' : undefined}
-              tabIndex={project.images ? 0 : undefined}
-              aria-label={project.images ? '打开' + project.title : undefined}
-              onClick={() => project.images && onOpenProject(project)}
-              onKeyDown={(event) => {
-                if (!project.images) return;
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  onOpenProject(project);
-                }
-              }}
-              {...glowDefaults}
-              {...glowThemes[project.tone as keyof typeof glowThemes]}
-              style={{ '--stagger': `${index * 90}ms` } as React.CSSProperties}
-            >
-              <div className="compact-project-visual">
-                <img src={project.images?.[0] ? coverOf(project.images[0].src) : undefined} alt={project.images?.[0]?.alt} loading="lazy" />
-              </div>
-              <div className="compact-project-head">
-                <div>
-                  <span>{project.type}</span>
-                  <h3>{project.title}</h3>
-                </div>
-                <small>{project.images?.length} 件作品</small>
-              </div>
-              <div className="compact-project-copy">
-                <p>{project.summary}</p>
-                <b>查看项目 <ArrowUpRight size={13} /></b>
-              </div>
-            </BorderGlow>
-        ))}
+      <SectionHeading name="作品展示" latin="Selected Works" lead="真实项目中的视觉判断与执行" />
+      <div className="works-stage">
+        <AccordionGallery
+          items={items}
+          defaultIndex={0}
+          orientation={narrow ? 'vertical' : 'horizontal'}
+          /* height 只在首帧量出宽度之前兜底，量完就由 mediaRatio 接管：
+             展开那张的宽 = (整块宽 - 3×12) × 0.44，高按 4/3 反算，
+             1440 下是 576×432。原来死给 620，等于一个 576×620 的竖框装 4:3 的横图，
+             cover 横裁 15%，面板再只露 82%，最后海报只剩中间七成、被放大 1.43 倍。
+             竖折同一个道理，只是反过来由宽度反算高度（390 下 354×265，原来是 354×328、
+             横裁 19%）。 */
+          height={narrow ? 488 : 620}
+          mediaRatio={4 / 3}
+          expandRatio={0.44}
+          gap={12}
+          radius={16}
+          parallax={0.5}
+          /* 倾斜会让左右两侧的视宽不一样（透视压扁），四条缝看着就宽窄不齐。
+             这里要的是齐，所以关掉 3D 倾斜，只留图内的位移。 */
+          tilt={0}
+          accentColor="#c9a26b"
+          overlayColor="#171208"
+          trigger="hover"
+          /* 卡内那行分类标签关掉了。原来卡片是海报的一段裁切，左下角是空的，
+             标签叠上去没事；现在卡片正好是一整张海报，左下角就是海报自己的版面——
+             「餐厅推广视觉」那张实测直接被这行字压住食材清单「炭火前味 & 沙拉」。
+             分类名也没丢：下面那行写着「02 / 04 · 7 件 · 新品套餐 / 饮品推广」，
+             右边按钮是「查看「餐厅推广视觉」整组」，两处都在说同一件事。 */
+          showLabels={false}
+          onIndexChange={setCurrent}
+          onSelect={openProject}
+        />
+      </div>
+      <div className="works-actions">
+        <span className="works-count">
+          {String(current + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+          <i />
+          {projects[current]?.images?.length} 件 · {projects[current]?.scope}
+        </span>
+        <button className="works-open" type="button" onClick={() => openProject(current)}>
+          查看「{projects[current]?.title}」整组 <ArrowUpRight size={13} />
+        </button>
       </div>
     </section>
   );
@@ -584,6 +708,19 @@ function WorkGallery({ project, activeImage, onClose, onOpenImage, onCloseImage 
   onCloseImage: () => void;
 }) {
   if (!project?.images) return null;
+
+  const images = project.images;
+  const total = images.length;
+  /* 当前是这一组的第几张：按 src 找回下标，而不是让外面再传一个 index。
+     折页那张卡是直接带着 images[0] 进来的，外面并没有"第几张"这个概念。 */
+  const index = activeImage ? images.findIndex((item) => item.src === activeImage.src) : -1;
+  const canStep = index >= 0 && total > 1;
+  /* 头尾接上：在最后一张按「下一张」回到第一张。这一组 16 张，
+     翻到头按钮没反应会让人以为坏了。 */
+  const step = (delta: number) => {
+    if (!canStep) return;
+    onOpenImage(images[(index + delta + total) % total]);
+  };
 
   return (
     <div className={'work-gallery-shell' + (activeImage ? ' has-lightbox' : '')} aria-modal="true" role="dialog" aria-label={project.title}>
@@ -623,13 +760,37 @@ function WorkGallery({ project, activeImage, onClose, onOpenImage, onCloseImage 
       {activeImage && (
         <div className="poster-lightbox" role="dialog" aria-modal="true" aria-label={activeImage.title}>
           <button className="lightbox-backdrop" type="button" aria-label="关闭放大预览" onClick={onCloseImage} />
-          <figure className="lightbox-frame">
-            <img src={activeImage.src} alt={activeImage.alt} />
-            <figcaption>
-              <strong>{activeImage.title}</strong>
-              <span>{activeImage.meta}</span>
-            </figcaption>
-          </figure>
+          {/* 原来图和图注直接放在 figure 里，figure 自己是 828×812 的盒子，
+              而图只占左边 486、图注只有 320×112 落在右下角——中间那一大片空盒子
+              仍然接住点击，于是"点海报旁边的空白"关不掉，只有点到 figure 外面才行。
+              现在外面套一层 .lightbox-shell，shell 和 figure 都设成 pointer-events:none，
+              只有图、图注、两个翻页按钮能接点击，其余全部穿透到最底下的 backdrop。 */}
+          <div className="lightbox-shell">
+            {canStep && (
+              <button className="lightbox-nav is-prev" type="button" aria-label="上一张作品" onClick={() => step(-1)}>
+                <ChevronLeft size={20} strokeWidth={1.75} />
+              </button>
+            )}
+            <figure className="lightbox-frame">
+              <img src={activeImage.src} alt={activeImage.alt} />
+              <figcaption>
+                <strong>{activeImage.title}</strong>
+                <span>{activeImage.meta}</span>
+                {canStep && (
+                  <em className="lightbox-count">
+                    {String(index + 1).padStart(2, '0')}
+                    <i>/</i>
+                    {String(total).padStart(2, '0')}
+                  </em>
+                )}
+              </figcaption>
+            </figure>
+            {canStep && (
+              <button className="lightbox-nav is-next" type="button" aria-label="下一张作品" onClick={() => step(1)}>
+                <ChevronRight size={20} strokeWidth={1.75} />
+              </button>
+            )}
+          </div>
           <button className="lightbox-close" type="button" aria-label="关闭放大预览" onClick={onCloseImage}><X size={18} /></button>
         </div>
       )}
@@ -640,14 +801,19 @@ function WorkGallery({ project, activeImage, onClose, onOpenImage, onCloseImage 
 function Strengths() {
   return (
     <section id="strengths" className="section-block strengths-section">
-      <SectionHeading kicker="个人优势" title="从需求理解到文件交付，独立推进完整设计流程。" text="Capability" />
+      <SectionHeading name="个人优势" latin="Capability" lead="从需求理解到文件交付，独立推进完整设计流程。" />
       <div className="strength-grid">
         {strengths.map((item, index) => {
           const Icon = item.icon;
           return (
             <article className="strength-card strength-panel reveal-block" key={item.title} style={{ '--stagger': `${index * 80}ms` } as React.CSSProperties}>
-              <div className="icon-box"><Icon size={22} strokeWidth={1.6} /></div>
-              <h3>{item.title}</h3>
+              {/* 原来是 <div class="icon-box"> 44×44 圆角方块压在 h3 上方。
+                  检测器点名的就是这个形状：任何生成器都会输出的"图标块 + 标题 + 说明"功能卡。
+                  现在图标跟标题并排，图标没有自己的容器，也不再顶开一段 42px 的空白。 */}
+              <div className="strength-head">
+                <Icon className="strength-icon" size={19} strokeWidth={1.5} aria-hidden="true" />
+                <h3>{item.title}</h3>
+              </div>
               <p>{item.text}</p>
             </article>
           );
@@ -662,11 +828,14 @@ function Contact() {
     <section id="contact" className="section-screen contact-section">
       <div className="contact-shell reveal-block">
         <div className="contact-copy">
+          {/* 这块原本是手写的一份「小标签 + 大长句」，跟上面三个板块同一个毛病：
+              板块名 14px、观点 34px。这里没有复用 SectionHeading，因为联系区
+              是两栏（左边文案 + 右边二维码）、也没有那条下边线，套进来会错位。 */}
           <div className="contact-heading-meta">
-            <p>联系信息</p>
+            <h2>联系信息</h2>
             <span>Contact</span>
           </div>
-          <h2>如果我的经验与你们正在寻找的方向匹配，欢迎与我联系。</h2>
+          <p className="contact-lead">如果我的经验与你们正在寻找的方向匹配，欢迎与我联系。</p>
           <p className="contact-text">手机号、邮箱和微信都保留在这里，方便你选择更顺手的方式联系我。</p>
           <div className="contact-actions">
             <a className="liquid-glass" href={'tel:' + profile.phone}><Phone size={16} />{profile.phone}</a>

@@ -107,7 +107,9 @@ a { color: inherit; text-decoration: none; }
 .front-sequence::after { content: ""; position: absolute; left: 50%; top: 0; width: min(1120px, calc(100vw - 180px)); height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, rgba(154,123,79,.32) 16%, rgba(122,92,51,.42) 50%, rgba(154,123,79,.32) 84%, transparent); opacity: .58; pointer-events: none; }
 .section-block { width: min(1700px, calc(100vw - 96px)); margin: 0 auto; padding: 112px 0; }
 .front-sequence .section-block { padding-top: 78px; padding-bottom: 84px; }
-.projects-section { width: min(1520px, calc(100vw - 72px)); padding-top: 60px !important; padding-bottom: 64px; }
+/* 宽度跟着 .section-block 走，不再单独收一圈。原来这里比别的 section 各宽 24px，
+   标题线的左端和下面内容的左端就差这么一点，怎么调都觉得是歪的。 */
+.projects-section { padding-top: 60px !important; padding-bottom: 64px; }
 .about-section::before, .projects-section::before, .strengths-section::before, .contact-section::before { content: ""; position: absolute; inset: -120px calc((100vw - min(1700px, calc(100vw - 96px))) / -2); z-index: -1; pointer-events: none; opacity: .42; filter: none; }
 .about-section::before { background:
   radial-gradient(circle at 8% 12%, rgba(154,123,79,.08), transparent 24%),
@@ -124,15 +126,38 @@ a { color: inherit; text-decoration: none; }
   radial-gradient(circle at 100% 68%, rgba(122,92,51,.08), transparent 20%),
   radial-gradient(circle at 40% 40%, rgba(46,42,36,.07), transparent 42%);
 }
+/* 板块标题组：h2 = 板块名（个人介绍/作品展示/个人优势），下面一行 = 一句说明。
+   原来这里是反的——h2 给了一句长话，板块名被压成 14px/600 的小眉标，
+   比正文（13px）还大还粗，caption 压过 body，读者也认不出这是哪一块。 */
 .section-heading { display: grid; gap: 12px; margin-bottom: 26px; padding-bottom: 18px; border-bottom: 1px solid rgba(46,42,36,.16); }
-.section-heading-meta { display: flex; align-items: baseline; gap: 12px; align-self: start; align-content: start; padding-top: 0; }
-.section-heading p { margin: 0; color: rgba(46,42,36,.72); font-size: 14px; line-height: 1; letter-spacing: .06em; font-weight: 600; }
-.section-heading h2 { display: block; max-width: 780px; margin: 0; color: var(--ink); font-size: clamp(28px, 2.5vw, 40px); line-height: 1.14; font-weight: 500; letter-spacing: 0; text-wrap: balance; }
-.section-heading span { color: rgba(46,42,36,.60); font-size: 12px; line-height: 1; letter-spacing: .14em; text-transform: uppercase; }
-.projects-section .section-heading { margin-bottom: 20px; padding-bottom: 14px; }
-.projects-section .section-heading h2 { max-width: 640px; }
+.section-heading-meta { display: flex; align-items: baseline; gap: 14px; align-self: start; align-content: start; padding-top: 0; }
+/* 这行原来没写 font-family，一路继承到 :root 的 'Barlow'。Barlow 里没有汉字，
+   于是四个板块标题实际掉到系统雅黑，全站只有 hero h1 真的用上了 Noto Serif SC。
+   这里显式指定，标题才落在同一套衬线上。 */
+.section-heading h2 {
+  display: block;
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  font-size: clamp(26px, 2.2vw, 36px);
+  line-height: 1.16;
+  font-weight: 600;
+  letter-spacing: .01em;
+  text-wrap: balance;
+}
+/* .68 而不是 .60：12px 大写英文在原透明度下只有 3.9:1，掉到 4.5 以下 */
+.section-heading span { color: rgba(46,42,36,.68); font-size: 12px; line-height: 1; letter-spacing: .14em; text-transform: uppercase; }
+/* 长句现在是说明文字，回到正文级：18px、行高 1.7、720px ≈ 40 个汉字/行。
+   跟 15px 正文是 1.2 倍、跟 31.7px 的板块名是 1.76 倍，三级分得开。
+   balance 不是随手加的：窄屏这句会断成「…物料能否 / 落地。」，
+   末行只剩两个字，被平衡成两行各一半才不孤。 */
+.section-heading-lead { max-width: 720px; margin: 0; color: rgba(46,42,36,.72); font-size: 18px; line-height: 1.7; text-wrap: balance; }
+.projects-section .section-heading { margin-bottom: 26px; padding-bottom: 14px; }
 
-.about-grid { display: grid; grid-template-columns: minmax(250px, 286px) minmax(0, 1fr); gap: 18px; align-items: stretch; }
+/* 名片列：ProfileCard 自己带 340 的宽度和 4:5 的图，撑不满的列只会把卡悬在中间，
+   所以列宽按卡的尺寸给（原来的 250–286 是按老那张可拉伸的相册卡定的）。
+   旧的 .portrait-* 规则还在下面，现在没人用了，留着方便回滚。 */
+.about-grid { display: grid; grid-template-columns: minmax(300px, 348px) minmax(0, 1fr); gap: 18px; align-items: stretch; }
 .projects-section { padding-top: 72px !important; }
 .strengths-section { padding-top: 88px; padding-bottom: 132px; }
 .portrait-card { border-radius: 22px; min-height: 100%; }
@@ -148,7 +173,106 @@ a { color: inherit; text-decoration: none; }
 .portrait-art span { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 38px; line-height: .98; letter-spacing: .01em; }
 .portrait-art small { position: absolute; left: 20px; top: 18px; z-index: 1; color: rgba(255,253,248,.82); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
 .portrait-photo span { position: relative; z-index: 1; color: #fffdf8; text-shadow: 0 10px 30px rgba(46,42,36,.18); }
-.portrait-meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; color: rgba(46,42,36,.52); font-size: 12px; line-height: 1.4; }
+.portrait-meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; color: rgba(46,42,36,.66); font-size: 13px; line-height: 1.4; }
+
+/* ===========================================================================
+   个人介绍的名片：React Bits ProfileCard（倾斜 + 全息箔 + 跟随光标的高光 + 入场扫光）
+   组件源码见 components/ProfileCard.jsx，样式逐字保留在上游那份 CSS 里，
+   这一节只做「接进这个站」必须做的事：暖色、字体、裁切、尺寸。
+
+   为什么满屏 !important：组件把 THEMES.light 整张表当**内联自定义属性**写在根节点上
+   （style={{...THEMES[palette]}}），内联优先级高于任何选择器，样式表想改只能用
+   !important。动效相关的变量（--pc-holo/--pc-glare/--pc-shift-* 等）不碰，全交给组件。
+   =========================================================================== */
+.about-idcard { display: grid; place-items: start; }
+/* 组件写死 width:340px。列是 300–348 之间变的，让它跟列走。
+   max-width 那句是给 1080 以下用的：那一档 about-grid 掉成单列，列宽变成整个内容区，
+   不封顶的话 1024 下这张 4:5 的卡会被撑成 928×1219——一张脸占满一屏还多。
+   348 是两列时它能拿到的最宽值，封在这儿跟大屏看起来是同一张卡。 */
+.about-idcard .profile-card { width: 100%; max-width: 348px; }
+
+.about-idcard .profile-card {
+  --pc-frame: rgba(255, 253, 248, .82) !important;
+  --pc-frame-edge: rgba(46, 42, 36, .10) !important;
+  --pc-frame-highlight: rgba(255, 255, 255, .92) !important;
+  --pc-frame-shadow: 0 26px 52px -26px rgba(46, 42, 36, .42), 0 8px 18px -12px rgba(46, 42, 36, .20) !important;
+  --pc-tile: linear-gradient(180deg, #fffdf8 0%, #f7efe1 100%) !important;
+  --pc-tile-edge: rgba(46, 42, 36, .12) !important;
+  --pc-tile-highlight: rgba(255, 255, 255, 1) !important;
+  --pc-tile-shadow: 0 6px 16px -8px rgba(46, 42, 36, .28) !important;
+  --pc-ink: #2e2a24 !important;
+  /* 底栏落在渐变的下端 #f7efe1 上，.66 算下来 4.49:1，差一点点不到 4.5；.70 是 5.05 */
+  --pc-muted: rgba(46, 42, 36, .70) !important;
+  --pc-shade: rgba(46, 42, 36, .16) !important;
+}
+
+/* 原图 1920×2560（3:4），卡片是 4:5，cover 之后纵向要切 6%。组件默认从底部对齐，
+   会从头开始切——他的脸在上半部，头发先没。老那张卡用的是 center 16%，照搬。 */
+.about-idcard .profile-card__photo {
+  object-position: center 16%;
+  filter: saturate(.94) contrast(1.02) brightness(1.02);
+}
+
+/* 名字。组件默认是 20px 700 的界面黑体，老卡上是 Bodoni Moda 斜体 38px——
+   这一处是整张卡最容易被认出来的地方，保留。 */
+.about-idcard .profile-card__name {
+  font-family: 'Bodoni Moda', 'Noto Serif SC', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: .01em;
+  text-shadow: 0 10px 30px rgba(24, 20, 12, .28);
+}
+
+/* 角色那行：老卡是压在照片左上角的 11px 大写小字，组件默认排在名字下面。
+   把 info 撑满整块图（名字靠底），角色绝对定位回左上角，跟原来一致。 */
+.about-idcard .profile-card__info {
+  inset: 0;
+  padding: 17px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+/* 顶部那束暗角是给左上角那行小字做底衬的。组件的 scrim 只铺下半截，
+   照片顶部是天花板的亮区，白字压不住。 */
+.about-idcard .profile-card__info::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 30%;
+  background: linear-gradient(180deg, rgba(24, 20, 12, .44) 0%, rgba(24, 20, 12, 0) 100%);
+  pointer-events: none;
+}
+.about-idcard .profile-card__title {
+  position: absolute;
+  left: 20px;
+  top: 17px;
+  margin: 0;
+  color: rgba(255, 253, 248, .88);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+/* 底栏那行：原卡上是「平面视觉 / 摄影后期 / 品牌物料」，组件里现成的槽位是 status。
+   串太长，300 宽的列里配着右侧 87 宽的按钮放不下（组件写死 nowrap 会直接顶出去），
+   所以允许换行，圆点跟着第一行走。 */
+.about-idcard .profile-card__status {
+  align-items: flex-start;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: .01em;
+}
+.about-idcard .profile-card__status::before { margin-top: 5px; width: 5px; height: 5px; }
+
+/* 按钮：组件默认是卡内浅色药丸，跟站里其它次级按钮同一套语言，只把图标和字距对齐一下 */
+.about-idcard .profile-card__contact { font-size: 12.5px; letter-spacing: .02em; }
+.about-idcard .profile-card__contact svg { flex: none; }
+.about-idcard .profile-card__footer { padding: 8px 20px 10px; }
+
 .about-sheet { position: relative; display: grid; grid-template-rows: auto auto auto; min-height: 390px; border-radius: 18px; border: 1px solid rgba(46,42,36,.16); background:
   linear-gradient(145deg, var(--surface), var(--paper));
   background-size: auto;
@@ -166,11 +290,12 @@ a { color: inherit; text-decoration: none; }
 .about-fact-grid,
 .about-contact-list { position: relative; z-index: 1; }
 .about-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 22px 14px; border-bottom: 1px solid rgba(46,42,36,.16); }
-.about-sheet-title p { margin: 0; color: rgba(46,42,36,.58); font-size: var(--label-size); letter-spacing: calc(var(--label-spacing) + .06em); text-transform: uppercase; }
+/* .67：这块底下是 about-sheet 的渐变最亮处 #fdfbf4，.58 只有 3.71:1 */
+.about-sheet-title p { margin: 0; color: rgba(46,42,36,.67); font-size: var(--label-size); letter-spacing: calc(var(--label-spacing) + .06em); text-transform: uppercase; }
 .about-sheet-title h3 { max-width: 420px; margin: 7px 0 0; font-size: clamp(20px, 1.65vw, 26px); line-height: 1.1; font-weight: 500; letter-spacing: 0; font-family: 'Barlow', sans-serif; }
 .about-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: 9999px; background: rgba(201,162,107,.20); color: var(--accent-deep); font-size: 11px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
 .about-sheet-copy { display: grid; gap: 8px; padding: 15px 22px 16px; border-bottom: 1px solid rgba(46,42,36,.16); }
-.about-sheet-copy p { margin: 0; max-width: 720px; color: rgba(46,42,36,.72); font-size: 13px; line-height: 1.58; }
+.about-sheet-copy p { margin: 0; max-width: 720px; color: rgba(46,42,36,.72); font-size: 15px; line-height: 1.72; }
 .about-fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .about-fact-card { min-height: 92px; padding: 16px 18px 18px; border-right: 1px solid rgba(46,42,36,.16); border-bottom: 1px solid rgba(46,42,36,.16); }
 .about-fact-card:nth-child(2n) { border-right: 0; }
@@ -184,22 +309,115 @@ a { color: inherit; text-decoration: none; }
 .contact-list a::before, .contact-actions a::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: linear-gradient(135deg, #e6d3ac, #c9a26b 52%, #a8865a); opacity: 0; transition: opacity .25s ease; }
 .contact-list a:hover, .contact-actions a:hover, .contact-list a.is-hovered, .contact-actions a.is-hovered { color: #fffdf8; background: transparent; transform: translateY(-1px); box-shadow: 0 14px 34px rgba(154,123,79,.18), inset 0 1px 0 rgba(255,255,255,.9); }
 .contact-list a:hover::before, .contact-actions a:hover::before, .contact-list a.is-hovered::before, .contact-actions a.is-hovered::before { opacity: 1; }
-.compact-project-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
-.compact-project-card { min-height: 0; cursor: pointer; }
-.compact-project-card .border-glow-inner { display: grid; grid-template-rows: auto auto 1fr; gap: 10px; height: 100%; padding: 10px; background: linear-gradient(145deg, var(--surface), var(--paper)); box-shadow: inset 0 1px 0 rgba(255,255,255,.9); }
-.compact-project-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 48px; padding: 0 2px; }
-.compact-project-head h3 { margin: 5px 0 0; color: var(--ink); font-size: clamp(16px, 1.02vw, 18px); line-height: 1.08; font-weight: 600; }
-.compact-project-head span { display: block; margin: 0; color: rgba(46,42,36,.52); font-size: 11px; line-height: 1; letter-spacing: .14em; text-transform: uppercase; }
-.compact-project-head small { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; padding: 0 9px; border-radius: 9999px; border: 1px solid rgba(46,42,36,.16); background: rgba(255,253,248,.72); color: var(--accent-deep); font-size: 11px; line-height: 1; white-space: nowrap; }
-.compact-project-visual { position: relative; overflow: hidden; aspect-ratio: 1.12; border-radius: 14px; border: 1px solid rgba(46,42,36,.18); background: var(--surface-2); }
-.compact-project-visual::before { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(46,42,36,.16), inset 0 1px 0 rgba(255,255,255,.5); }
-.compact-project-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(46,42,36,0) 68%, rgba(46,42,36,.28) 100%); pointer-events: none; }
-.compact-project-visual img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform .55s cubic-bezier(.16,1,.3,1), filter .45s ease; }
-.compact-project-card:hover .compact-project-visual img { transform: scale(1.026); filter: saturate(1.04) contrast(1.02); }
-.compact-project-copy { display: grid; grid-template-rows: 1fr auto; gap: 8px; min-height: 84px; padding: 0 2px 2px; }
-.compact-project-copy p { margin: 0; color: rgba(46,42,36,.72); font-size: 12px; line-height: 1.58; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.compact-project-copy b { display: inline-flex; align-items: center; gap: 6px; width: fit-content; min-height: 20px; padding: 0; border-radius: 0; border: 0; color: rgba(46,42,36,.72); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; transition: color .25s ease, transform .25s ease; }
-.compact-project-card:hover .compact-project-copy b { color: var(--accent-deep); transform: translateX(2px); }
+
+/* ===========================================================================
+   作品区：四组分类各一张封面，横向折页（AccordionGallery / GSAP）
+   上一版是居中一张 960 的画框——标题贴着左边线、画框居中，两边留白对不上。
+   这一版整块跟标题的下边线同宽，四张卡平铺到边，左中右都是齐的。
+   =========================================================================== */
+
+.works-stage {
+  position: relative;
+}
+
+/* 组件自带的是纯黑投影，页面是暖纸底，换成更低的暖色，别在浅底上凿出黑边 */
+.works-stage .ag-panel {
+  box-shadow: 0 20px 46px -32px rgba(46, 42, 36, .6);
+}
+
+/* 说明条字号：中文比英文占宽，收到 15px，字距也收掉一点 */
+.works-stage .ag-panel__text {
+  font-size: 15px;
+  letter-spacing: .02em;
+}
+
+/* 组件原样式把 color-mix() 写在 background 简写的最后一层，Chrome 判为不合法、
+   整条丢掉（实测 getComputedStyle 的 backgroundImage 是 none）——也就是说
+   "收起时压暗"这个功能从来没生效过，那张浅色海报才会比展开的还亮。
+   改成 background-color 一条长写，压暗量握在自己手里。
+   底部那层 62%→100% 的渐变也去掉了：它本来只是给卡内分类标签做可读性底衬，
+   标签拿掉之后它就只剩下把手上海报的落款压暗这一件事，跟"海报要完整"相反。 */
+.works-stage .ag-panel__overlay {
+  background-color: rgba(23, 18, 8, 0);
+  transition: background-color .5s ease;
+}
+
+/* 收起来的三条是海报中段，会露出半截标题（「主厨推荐单人套」「Signature
+   Single Set Me」）。压到 34%，让它们只当纹理。 */
+.works-stage .ag-panel:not(.ag-panel--active) .ag-panel__overlay {
+  background-color: rgba(23, 18, 8, .34);
+}
+
+/* 实测四张的平均亮度：展开 46，收起 18 / 91 / 78——「主题活动」那张是浅粉底，
+   收起状态比展开的还亮一倍，视线会被它带走。除了压暗，再给收起的图降一档亮度，
+   四张才拉平；transition 让 hover 时这档亮度是渐变过去的，不是硬切。 */
+.works-stage .ag-panel__media {
+  transition: filter .45s ease;
+}
+
+.works-stage .ag-panel:not(.ag-panel--active) .ag-panel__media {
+  filter: grayscale(var(--ag-gray)) brightness(.58);
+}
+
+.works-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.works-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  /* .70：这一行的底是 --paper #ece0ca，.42 在上面只有 2.31:1，全站最差的一处 */
+  color: rgba(46, 42, 36, .70);
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+
+/* 序号和后面的件数之间一个细点，别用竖线——这里已经够多直线了 */
+.works-count i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(46, 42, 36, .28);
+}
+
+.works-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: rgba(46, 42, 36, .66);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: color .25s ease, transform .25s ease;
+}
+
+.works-open:hover { color: var(--accent-deep); transform: translateX(2px); }
+
+@media (max-width: 760px) {
+  /* 窄屏横切四片只剩几十像素宽，改成竖折。组件自带的 520 断点会把列布局拍平成
+     等高列表（height:auto 时 flexGrow 不生效，展开那张撑不开），所以这里必须带
+     !important 把高度按住。高度值改由组件的 measure() 按宽度算好写在 --ag-root-h 上
+     （竖折要保证展开那张还是 4:3，宽高得成比例，定死 781 在 390 下会横裁 19%）。 */
+  .works-stage .accordion-gallery {
+    flex-direction: column;
+    height: var(--ag-root-h, 781px) !important;
+  }
+  .works-stage .ag-panel { min-height: 0; }
+  .works-stage .ag-panel__media { width: 100%; height: var(--ag-media-size); }
+  /* 一行放不下，改成上下两行，别让件数说明折成三截 */
+  .works-actions { flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 14px; }
+  .works-open { font-size: 11.5px; }
+  .works-count { font-size: 11.5px; }
+}
 
 .work-gallery-shell { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 30px; animation: galleryShellIn .46s cubic-bezier(.16,1,.3,1) both; }
 .gallery-backdrop { position: absolute; inset: 0; border: 0; background: rgba(46,42,36,.46); backdrop-filter: blur(16px) saturate(1.02); -webkit-backdrop-filter: blur(16px) saturate(1.02); cursor: pointer; animation: galleryVeilIn .45s ease both; }
@@ -227,12 +445,50 @@ a { color: inherit; text-decoration: none; }
 .gallery-poster[data-gallery-tone="silver"] span { opacity: .58; }
 .poster-lightbox { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 34px; animation: lightboxIn .34s ease both; }
 .lightbox-backdrop { position: absolute; inset: 0; border: 0; background: rgba(46,42,36,.46); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); cursor: zoom-out; }
-.lightbox-frame { position: relative; z-index: 1; margin: 0; display: grid; grid-template-columns: minmax(280px, min(54vh, 560px)) minmax(220px, 320px); gap: 22px; align-items: end; transform-origin: center; animation: lightboxFrameIn .52s cubic-bezier(.16,1,.3,1) both; }
-.lightbox-frame img { max-width: min(54vh, 560px); max-height: calc(100vh - 88px); width: 100%; object-fit: contain; border-radius: 22px; border: 1px solid rgba(46,42,36,.26); box-shadow: 0 34px 100px rgba(46,42,36,.18); background: rgba(255,253,248,.88); }
-.lightbox-frame figcaption { padding: 24px; border-radius: 24px; background: var(--surface); border: 1px solid rgba(46,42,36,.18); box-shadow: var(--shadow-lift); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-.lightbox-frame strong { display: block; font-size: 26px; font-weight: 400; }
-.lightbox-frame span { display: block; margin-top: 10px; color: rgba(46,42,36,.52); font-size: 13px; letter-spacing: .12em; }
+
+/* 点击层级：.lightbox-shell 和 .lightbox-frame 都不接点击，只有图、图注、翻页按钮接。
+   原来图和图注直接摊在 figure 里，figure 自己是 828×812 的盒子（图只占左边 486、
+   图注只有 320×112 落在右下角），中间那一片空盒子把"点海报旁边的空白"吃掉了，
+   所以只有点到 figure 外面才关得掉。设成 none 之后，空白处一路穿透到 backdrop。 */
+.lightbox-shell { position: relative; z-index: 1; display: grid; grid-template-columns: auto auto auto; align-items: center; gap: 16px; pointer-events: none; animation: lightboxFrameIn .52s cubic-bezier(.16,1,.3,1) both; }
+.lightbox-frame { margin: 0; display: grid; grid-template-columns: minmax(280px, min(54vh, 560px)) minmax(220px, 320px); gap: 22px; align-items: end; pointer-events: none; }
+/* width/height 都给 auto：让盒子贴着图本身。原来是 width:100% + object-fit:contain，
+   486 的列里放一张 375 宽的竖版海报，两侧各留 55px 的米色"信箱边"——那两条也是 img 的盒子，
+   会接住点击，等于海报两边各有一段点不动、也关不掉的死区。
+   max-width 里那个 100% 是防溢出：列宽被挤到 280 时（768 那一档），
+   光有 54vh 会让图长到 350、横着戳出列外，压到左边的箭头。 */
+.lightbox-frame img { pointer-events: auto; justify-self: center; width: auto; height: auto; max-width: min(100%, 54vh, 560px); max-height: calc(100vh - 88px); border-radius: 22px; border: 1px solid rgba(46,42,36,.26); box-shadow: 0 34px 100px rgba(46,42,36,.18); }
+.lightbox-frame figcaption { pointer-events: auto; padding: 24px; border-radius: 24px; background: var(--surface); border: 1px solid rgba(46,42,36,.18); box-shadow: var(--shadow-lift); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+/* balance：窄一点的屏上图注卡只有 247 宽，「洲际夏至节气海报」会断成「…节气海 / 报」，
+   末行一个字。均分之后是「洲际夏至 / 节气海报」。 */
+.lightbox-frame strong { display: block; font-size: 26px; font-weight: 400; text-wrap: balance; }
+/* .52 在 #fffdf8 上只有 3.19:1，13px 正文级按 AA 要 4.5；.66 是 4.75 */
+.lightbox-frame span { display: block; margin-top: 10px; color: rgba(46,42,36,.66); font-size: 13px; letter-spacing: .12em; }
+
+/* 翻页按钮。位置交给 shell 的三列，所以永远贴在整块的两侧、跟着海报一起收放，
+   不会在窄一点的屏上压到海报上面去。 */
+.lightbox-nav { pointer-events: auto; width: 46px; height: 46px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(46,42,36,.20); border-radius: 9999px; background: rgba(255,253,248,.90); color: var(--ink); cursor: pointer; box-shadow: 0 14px 30px rgba(46,42,36,.14); transition: background .25s ease, color .25s ease, transform .25s ease; }
+.lightbox-nav:hover { background: var(--accent); color: #fffdf8; transform: scale(1.05); }
+.lightbox-nav:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 3px; }
+
+/* 序号：12px 等宽数字，比图注两行再低一档，用一条细线隔开 */
+.lightbox-count { display: flex; align-items: baseline; gap: 4px; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(46,42,36,.16); color: rgba(46,42,36,.72); font-size: 12px; font-style: normal; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+.lightbox-count i { color: rgba(46,42,36,.40); font-style: normal; }
+
 .lightbox-close { position: fixed; right: 34px; top: 30px; }
+
+/* 900 以下三样东西横着排不下：箭头 46×2 + 两条缝 + 图的列 + 图注列。
+   硬挤的实测结果是图被压到 280 宽、还戳出列外压住左边那个箭头。
+   这一段把箭头换到海报下面排一行，frame 拿满宽度——图反而能到 350 宽。 */
+@media (max-width: 900px) {
+  .lightbox-shell { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+  .lightbox-frame { flex: 0 0 100%; }
+  .lightbox-nav { order: 2; }
+  /* 箭头挪到下面之后占掉 14+46 的高度，图的高度预算要跟着收：
+     100vh - 上下内边距 68 - 缝 14 - 箭头 46 - 余量 24。不收的话 768×844 下
+     实测整块 816 高、从 y34 起，底部 6px 被切掉。 */
+  .lightbox-frame img { max-height: calc(100vh - 152px); }
+}
 
 @keyframes galleryShellIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes galleryVeilIn { from { opacity: 0; } to { opacity: 1; } }
@@ -241,12 +497,19 @@ a { color: inherit; text-decoration: none; }
 @keyframes lightboxIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes lightboxFrameIn { from { opacity: 0; transform: translateY(30px) scale(.88); filter: blur(10px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
 
-.strength-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.strength-card { min-height: 236px; border-radius: 20px; }
-.strength-panel { padding: 23px; border: 1px solid rgba(46,42,36,.18); background: linear-gradient(145deg, var(--surface), var(--paper)); box-shadow: 0 16px 38px rgba(46,42,36,.06); }
-.icon-box { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; border: 1px solid var(--line); background: rgba(255,253,248,.88); color: var(--accent-deep); }
-.strength-card h3 { margin: 42px 0 0; font-size: 21px; line-height: 1.16; font-weight: 500; color: var(--ink); }
-.strength-card p { margin: 12px 0 0; color: rgba(46,42,36,.58); line-height: 1.72; font-size: 13px; }
+/* grid-auto-rows: 1fr —— 4 列时无所谓，2 列（≤1280）时不然：
+   每行各算各的高度，第二行比第一行高 26px，四张卡看着就不齐了。 */
+.strength-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 16px; }
+.strength-card { border-radius: 20px; }
+.strength-panel { padding: 24px; border: 1px solid rgba(46,42,36,.18); background: linear-gradient(145deg, var(--surface), var(--paper)); box-shadow: 0 16px 38px rgba(46,42,36,.06); }
+/* 图标回到流里：不再有 44×44 的圆角方块，也不再有它顶出来的那段底边距。
+   h3 的 margin-top 从 42px 收到 0，标题直接跟图标同一行。 */
+.strength-head { display: flex; align-items: center; gap: 9px; }
+.strength-icon { flex: none; color: var(--accent-deep); }
+.strength-card h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 500; letter-spacing: .01em; color: var(--ink); }
+/* .70：卡片底色是 --surface 到 --paper 的渐变，实测那一段是 #f1e7d5，
+   .58 在它上面只有 3.50:1。15px 正文按 AA 要 4.5:1。 */
+.strength-card p { margin: 12px 0 0; color: rgba(46,42,36,.70); line-height: 1.72; font-size: 15px; }
 
 .contact-section { position: relative; z-index: 10; min-height: min(660px, 78vh); display: grid; place-items: start center; margin-top: -44px; padding: 96px 48px 78px; overflow: hidden; background: var(--paper-deep); border-radius: 44px 44px 0 0; box-shadow: 0 -20px 48px rgba(46,42,36,.07), inset 0 1px 0 rgba(255,255,255,.45); }
 .contact-section::before { background:
@@ -255,23 +518,29 @@ a { color: inherit; text-decoration: none; }
 }
 .contact-footer { position: relative; z-index: 1; width: min(1180px, calc(100vw - 96px)); margin: 56px auto 0; padding-top: 20px; border-top: 1px solid rgba(46,42,36,.18); display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .contact-footer-name { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 20px; color: rgba(46,42,36,.88); }
-.contact-footer-note { color: rgba(46,42,36,.56); font-size: 12px; letter-spacing: .04em; }
+.contact-footer-note { color: rgba(46,42,36,.72); font-size: 12px; letter-spacing: .04em; }
 .contact-footer-top { display: inline-flex; align-items: center; gap: 6px; color: rgba(46,42,36,.72); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; transition: color .25s ease; }
 .contact-footer-top:hover { color: var(--accent-deep); }
 .contact-shell { width: min(1180px, calc(100vw - 96px)); display: grid; grid-template-columns: minmax(0, 1fr) 252px; gap: 30px; align-items: center; padding-top: 30px; border-top: 1px solid rgba(46,42,36,.18); }
 .contact-copy { text-align: left; }
-.contact-heading-meta { display: grid; gap: 7px; margin-bottom: 18px; }
-.contact-heading-meta p { margin: 0; color: rgba(46,42,36,.72); font-size: 14px; line-height: 1; letter-spacing: .08em; font-weight: 600; }
-.contact-heading-meta span { color: rgba(46,42,36,.60); font-size: 12px; line-height: 1; letter-spacing: .14em; text-transform: uppercase; }
-.contact-copy h2 { max-width: 680px; margin: 0; font-size: clamp(27px, 2.35vw, 34px); line-height: 1.18; letter-spacing: 0; font-weight: 500; text-wrap: balance; }
-.contact-text { max-width: 520px; margin: 14px 0 0; color: rgba(46,42,36,.72); line-height: 1.68; font-size: 13px; }
+.contact-heading-meta { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; }
+.contact-heading-meta h2 { margin: 0; color: var(--ink); font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif; font-size: clamp(26px, 2.2vw, 36px); line-height: 1.16; font-weight: 600; letter-spacing: .01em; }
+.contact-heading-meta span { color: rgba(46,42,36,.68); font-size: 12px; line-height: 1; letter-spacing: .14em; text-transform: uppercase; }
+/* 原来这句观点是 34px 的 h2、板块名是 14px 的小字，跟上面三个板块一样的倒挂。
+   现在观点回到说明级 16px，下面那行辅助说明保持 13px 的次级。 */
+.contact-lead { max-width: 640px; margin: 0; color: rgba(46,42,36,.72); font-size: 18px; line-height: 1.7; }
+.contact-text { max-width: 520px; margin: 10px 0 0; color: rgba(46,42,36,.72); line-height: 1.7; font-size: 15px; }
 .contact-actions { display: flex; align-items: center; justify-content: flex-start; gap: 11px; margin-top: 23px; flex-wrap: wrap; }
-.contact-qr-card { width: 252px; justify-self: end; padding: 10px; border-radius: 20px; border: 1px solid rgba(46,42,36,.18); background: linear-gradient(145deg, var(--surface), var(--paper)); box-shadow: 0 16px 38px rgba(46,42,36,.07); }
-.contact-qr-frame { border-radius: 14px; overflow: hidden; background: var(--surface); padding: 12px; }
-.contact-qr-frame img { display: block; width: 100%; height: auto; border-radius: 10px; }
-.contact-qr-meta { display: grid; gap: 5px; margin-top: 12px; padding: 0 2px 2px; }
+/* 原来这里是卡里套卡：外面 .contact-section 已经是 44px 圆角的整块面板，
+   里面再套一层带边框、底纹、投影、20px 圆角的卡片。拆掉外层壳，
+   只留二维码本身的白底和一条细边（白底是扫码需要的，不能去掉）。 */
+.contact-qr-card { width: 252px; justify-self: end; }
+.contact-qr-frame { border-radius: 12px; overflow: hidden; background: #fff; padding: 10px; border: 1px solid rgba(46,42,36,.14); }
+.contact-qr-frame img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.contact-qr-meta { display: grid; gap: 5px; margin-top: 14px; }
 .contact-qr-meta strong { font-size: 16px; line-height: 1.2; font-weight: 500; color: var(--text-strong); }
-.contact-qr-meta span { color: rgba(46,42,36,.52); font-size: 12px; line-height: 1.58; }
+/* .70：二维码卡原来的底是 #eee3ce，.52 在上面只有 2.96:1 */
+.contact-qr-meta span { color: rgba(46,42,36,.70); font-size: 13px; line-height: 1.6; }
 
 .reveal-block { opacity: 0; transform: translateY(24px); filter: none; transition: opacity .62s cubic-bezier(.16,1,.3,1), transform .62s cubic-bezier(.16,1,.3,1); transition-delay: var(--stagger, 0ms); }
 .reveal-block.is-visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
@@ -280,8 +549,11 @@ a { color: inherit; text-decoration: none; }
   .hero-section { padding-bottom: 126px; }
   .hero-section::after { height: 150px; }
   .section-block { padding: 96px 0; }
-  .projects-section { width: min(1600px, calc(100vw - 48px)); }
-  .about-grid { grid-template-columns: 292px minmax(0, 1fr); gap: 18px; }
+  /* 316 是老的相册卡宽度。名片换上来之后，底栏那行「● 平面视觉 / 摄影后期 / 品牌物料」
+     加右侧 86 宽的联系按钮，在 316 的列里放不下，会折成「…/ 品牌」+「物料」这种孤字行。
+     344 是它回到一行的宽度（实测一行要 175，344 给到 182），跟 1440 的 348 基本同宽，
+     右边那张介绍卡少 12px，看不出来。 */
+  .about-grid { grid-template-columns: minmax(286px, 344px) minmax(0, 1fr); gap: 18px; }
   .portrait-art { min-height: 456px; }
   .about-sheet { min-height: 420px; }
   .about-sheet-head { padding: 18px 22px 14px; }
@@ -294,8 +566,6 @@ a { color: inherit; text-decoration: none; }
   .gallery-stage { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gallery-poster { min-height: 520px; }
   .gallery-poster img { height: 400px; }
-  .compact-project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .compact-project-visual { aspect-ratio: 1.04; }
 }
 
 @media (max-width: 1080px) {
@@ -316,6 +586,11 @@ a { color: inherit; text-decoration: none; }
     grid-template-columns: 1fr;
     gap: 18px;
   }
+  /* 单列之后名片封了 348 的宽度，默认 place-items:start 会让它贴在左边，
+     1024 下右边空出五百多像素，看着像没做完。这一档把它居中——
+     一张名片摆在介绍卡上方，居中才像"放在纸上"。到 760 以下容器本身就只剩 354，
+     居不居中一样，不用再单独处理。 */
+  .about-idcard { justify-items: center; }
   .portrait-art { min-height: 420px; }
   .about-sheet { min-height: auto; }
   .strength-grid {
@@ -345,9 +620,6 @@ a { color: inherit; text-decoration: none; }
   .front-sequence { margin-top: -52px; padding-top: 44px; }
   .front-sequence::before { inset: 0 12px auto; border-radius: 28px 28px 0 0; }
   .front-sequence::after { width: calc(100vw - 120px); }
-  .compact-project-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 760px) {
@@ -369,12 +641,11 @@ a { color: inherit; text-decoration: none; }
   .hero-section { padding: 104px 22px 76px; }
   .hero-section::after { height: 124px; }
   .section-block { width: min(1700px, calc(100vw - 36px)); padding: 84px 0; }
-  .projects-section { width: min(1600px, calc(100vw - 36px)); }
   .section-heading { gap: 10px; margin-bottom: 22px; padding-bottom: 14px; }
-  .section-heading-meta { gap: 9px; }
-  .section-heading p { font-size: 13px; line-height: 1; letter-spacing: .06em; }
-  .section-heading h2 { font-size: 22px; line-height: 1.18; }
-  .section-heading span { font-size: 12px; line-height: 1; letter-spacing: .14em; }
+  .section-heading-meta { gap: 10px; }
+  .section-heading h2 { font-size: 24px; line-height: 1.2; }
+  .section-heading span { font-size: 11px; line-height: 1; letter-spacing: .14em; }
+  .section-heading-lead { font-size: 16px; line-height: 1.7; }
   .about-grid { grid-template-columns: 1fr; gap: 18px; }
   .portrait-card { min-height: auto; }
   .portrait-art { min-height: 320px; }
@@ -385,33 +656,26 @@ a { color: inherit; text-decoration: none; }
   .about-sheet-title h3 { font-size: clamp(32px, 10vw, 44px); line-height: 1; }
   .about-badge { min-height: 36px; width: fit-content; padding: 0 15px; font-size: 12px; }
   .about-sheet-copy { padding: 20px; }
-  .about-sheet-copy p { font-size: 13px; line-height: 1.72; }
+  .about-sheet-copy p { font-size: 15px; line-height: 1.72; }
   .about-fact-grid { grid-template-columns: 1fr; }
   .about-fact-card { min-height: auto; padding: 18px 20px; border-right: 0; }
   .about-fact-card:nth-last-child(-n + 2) { border-bottom: 1px solid rgba(46,42,36,.16); }
   .about-fact-card:last-child { border-bottom: 0; }
   .about-fact-card strong { margin-top: 10px; font-size: 14px; }
   .about-contact-list { padding: 20px; }
-  .compact-project-grid { grid-template-columns: 1fr; gap: 14px; }
-  .compact-project-card .border-glow-inner { padding: 12px; gap: 12px; }
-  .compact-project-head { min-height: auto; }
-  .compact-project-head h3 { font-size: 21px; }
-  .compact-project-head small { min-height: 26px; font-size: 11px; }
-  .compact-project-visual { aspect-ratio: 1.02; border-radius: 15px; }
-  .compact-project-copy { min-height: auto; }
   .strength-grid { grid-template-columns: 1fr; gap: 14px; }
   .strength-card { min-height: auto; }
-  .strength-card h3 { margin: 28px 0 0; font-size: 22px; }
+  .strength-card h3 { margin: 0; font-size: 19px; }
   .contact-section { min-height: auto; margin-top: -26px; padding: 80px 22px 72px; border-radius: 28px 28px 0 0; }
   .contact-shell { width: min(100%, calc(100vw - 36px)); gap: 22px; padding-top: 24px; }
-  .contact-heading-meta { gap: 7px; margin-bottom: 18px; }
-  .contact-heading-meta p { font-size: 13px; line-height: 1; letter-spacing: .1em; }
-  .contact-heading-meta span { font-size: 12px; line-height: 1; letter-spacing: .16em; }
-  .contact-copy h2 { font-size: clamp(24px, 7vw, 34px); line-height: 1.14; }
-  .contact-text { margin-top: 14px; font-size: 13px; line-height: 1.68; }
+  .contact-heading-meta { gap: 10px; margin-bottom: 14px; }
+  .contact-heading-meta h2 { font-size: 24px; line-height: 1.2; }
+  .contact-heading-meta span { font-size: 11px; line-height: 1; letter-spacing: .16em; }
+  .contact-lead { font-size: 16px; line-height: 1.7; }
+  .contact-text { margin-top: 10px; font-size: 15px; line-height: 1.7; }
   .contact-actions { flex-direction: column; gap: 10px; width: 100%; margin-top: 22px; }
   .contact-actions a { width: 100%; justify-content: center; }
-  .contact-qr-card { width: min(286px, 100%); max-width: none; justify-self: start; padding: 12px; border-radius: 22px; }
+  .contact-qr-card { width: min(286px, 100%); max-width: none; justify-self: start; }
   .contact-qr-frame { padding: 12px; border-radius: 16px; }
   .contact-qr-meta strong { font-size: 16px; }
   .contact-qr-meta span { font-size: 12px; line-height: 1.58; }
@@ -423,9 +687,13 @@ a { color: inherit; text-decoration: none; }
   .gallery-stage { grid-template-columns: 1fr; max-height: calc(100vh - 178px); gap: 18px; }
   .gallery-poster { min-height: auto; padding: 14px; border-radius: 22px; }
   .gallery-poster img { height: min(56vh, 430px); border-radius: 16px; }
+  /* 手机上再窄一档：图注从"右侧一列"变成"图下面一块"（同折页那套） */
+  .poster-lightbox { padding: 16px; }
   .lightbox-frame { grid-template-columns: 1fr; gap: 14px; align-items: center; }
   .lightbox-frame img { max-width: min(86vw, 520px); max-height: 70vh; margin: 0 auto; }
   .lightbox-frame figcaption { padding: 18px; }
+  .lightbox-nav { width: 44px; height: 44px; }
+  .lightbox-count { margin-top: 12px; padding-top: 12px; }
   .lightbox-close { right: 18px; top: 16px; }
 }
 
@@ -444,6 +712,20 @@ a { color: inherit; text-decoration: none; }
   .reveal-block, .gallery-poster {
     opacity: 1 !important;
     transform: none !important;
+  }
+  /* 名片这张是漏网的：它的倾斜和视差不由 CSS 动画驱动，是 JS 每帧把角度写进
+     --pc-rotate-x / --pc-shift-x 再由样式表取用，所以上面那条把 animation-duration
+     压到 1ms 对它没有作用，鼠标一动照样晃。这里直接把旋转和位移钉死。
+     下面四层（扫光/全息箔/高光/暗角）本来都由 --pc-active / --pc-tilt 乘出来、
+     静止时就是 0，关掉不影响静止画面，只是不再跟着鼠标闪。 */
+  /* 旋转挂在 __body 上（不是根节点：根节点只负责 perspective 和尺寸） */
+  .about-idcard .profile-card__body { transform: none !important; }
+  .about-idcard .profile-card__photo { transform: none !important; }
+  .about-idcard .profile-card__sheen,
+  .about-idcard .profile-card__holo,
+  .about-idcard .profile-card__glare,
+  .about-idcard .profile-card__shade {
+    display: none !important;
   }
 }
 
@@ -681,16 +963,14 @@ a { color: inherit; text-decoration: none; }
   opacity: 1;
 }
 
+/* 一列往下排，不再分左右两栏。
+   原来 4fr / 1fr 的时候标题在左边、说明挤在右边剩 1fr 里，两块的左边缘不是同一条，
+   排版上叫做"两条没有关系的竖线"。现在标题、说明、按钮共用同一条左边缘。 */
 .hero-identity-row {
-  display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(250px, 1fr);
-  align-items: end;
-  gap: 42px;
-}
-
-.hero-identity-row {
-  grid-template-columns: minmax(0, 2.2fr) minmax(280px, .8fr);
-  gap: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(24px, 3.2vh, 32px);
 }
 
 .hero-title-mask {
@@ -702,7 +982,11 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
   color: #fff;
   font-family: 'Noto Serif SC', 'Figtree', sans-serif;
-  font-size: clamp(48px, 4.35vw, 68px);
+  /* 1440 下 53px（原来 69）。之前按"字数少三成、字号提上来"的思路拉到 69，
+     实际是压过头了——跟 16px 的说明差 4.3 倍，像标语不像作品集。现在 3.3:1，收住了。
+     下限给到 41 而不是 36：1024 那档按 3.7vw 只有 37.9，标题看着像图注，
+     比它下面那段 600 宽的说明还弱。 */
+  font-size: clamp(41px, 3.7vw, 55px);
   font-weight: 500;
   line-height: 1.12;
   letter-spacing: 0;
@@ -718,26 +1002,31 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero-intro {
-  display: grid;
-  justify-items: start;
-  align-content: end;
-  gap: 28px;
-  padding-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 26px;
   opacity: 0;
-  transform: translateX(100px);
+  /* 它现在在标题正下方，跟标题同一条竖轴。原来那套从右边横向滑入
+     （translateX(100px)）是按"右侧栏"画的，放在下面会像从旁边插进来；
+     改成从下往上 24px，跟标题上升的方向一致。 */
+  transform: translateY(24px);
 }
 
 .hero-layout.is-ready .hero-intro {
-  animation: heroRevealRight .9s var(--ease-spring, cubic-bezier(.16,1,.3,1)) .08s forwards;
+  animation: heroIntroIn .9s var(--ease-spring, cubic-bezier(.16,1,.3,1)) .12s forwards;
 }
 
 .hero-intro p {
-  max-width: 390px;
+  /* 390px 是按右栏宽度定的；现在整行都给它。600 不是随手取的：
+     实测 560/580 会把「项目」拆成「项」在行尾、「目，可」在行首，
+     600 刚好断在「…物料等项目，」这个逗号后面，两行都是整句。 */
+  max-width: 600px;
   margin: 0;
   color: rgba(255,255,255,.94);
   font-size: 16px;
   font-weight: 500;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .hero-project-cta {
@@ -784,9 +1073,11 @@ a { color: inherit; text-decoration: none; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes heroRevealRight {
-  from { opacity: 0; transform: translateX(100px); }
-  to { opacity: 1; transform: translateX(0); }
+/* 说明块自己的入场：跟标题的 heroRevealUp 同一个方向，只是距离短，
+   因为它是从标题下面"长出来"，不是从屏外飞进来。 */
+@keyframes heroIntroIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 1199px) {
@@ -814,12 +1105,7 @@ a { color: inherit; text-decoration: none; }
   }
 
   .hero-identity-row {
-    grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
-    gap: 28px;
-  }
-
-  .hero-title-mask h1 {
-    font-size: clamp(44px, 5.15vw, 62px);
+    gap: 26px;
   }
 
   .hero-intro {
@@ -898,31 +1184,46 @@ a { color: inherit; text-decoration: none; }
 
   .hero-layout {
     padding-top: 140px;
-    padding-bottom: 44px;
+    /* 别往下压到 44px：下一节 .front-sequence 有 -66px 的上负边距，
+       米色卡片从 hero 底边往上起 66px。标题和说明挪到一列之后整块变高，
+       「查看作品」正好落进这 66px 里被卡片压住（实测 768 下压了 22px）。 */
+    padding-bottom: 88px;
     justify-content: flex-end;
     gap: 72px;
   }
 
+  /* 一列排下来之后，栅格列定义已经没用了，只留一个更紧的间距 */
   .hero-identity-row {
-    grid-template-columns: 1fr;
+    gap: 22px;
   }
 
-  .hero-identity-row {
-    gap: 32px;
-  }
-
+  /* 上限跟桌面那档的下限对齐（41），809/810 两个断点之间不会跳一个台阶 */
   .hero-title-mask h1 {
-    font-size: clamp(30px, 8.6vw, 40px);
+    font-size: clamp(29px, 7.6vw, 41px);
     line-height: 1.14;
     text-wrap: balance;
   }
 
+  /* 说明块原来限 460 是按右栏定的；现在它跟标题同一条左边缘，
+     560 让它两行读完，断点正好落在「…物料等项目，」后面。
+     收到 460 会变成「…宣传物 / 料等项」，把「物料」劈成两半。 */
   .hero-intro {
-    max-width: 460px;
+    max-width: 560px;
     gap: 22px;
   }
 
   .hero-intro p {
     font-size: 15px;
+  }
+}
+
+/* 手机一行只放得下 23 个汉字，字号差半个像素断行位置就换地方。
+   实测 15px 断成「…推广、餐 / 饮视觉…」，把「餐饮」劈开；
+   14.5px 断成「…、餐饮 / 视觉及…」，行尾停在完整的词上。
+   这个档只影响最小那一段，平板以上仍走 15px。 */
+@media (max-width: 520px) {
+  .hero-intro p {
+    font-size: 14.5px;
+    line-height: 1.72;
   }
 }
