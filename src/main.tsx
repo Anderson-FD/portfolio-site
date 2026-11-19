@@ -117,8 +117,8 @@ const allProjects: Project[] = [
        系列顺序照原海报上的编号排，没按视觉强弱重排。 */
     title: '个人创作',
     type: 'Self-Initiated',
-    scope: '概念海报 / 神话与王权 / 空间与自然',
-    summary: '没有委托方的自命题海报。题材从神话塑像、王权肖像延伸到建筑与山野，重心放在图像、字体与版式之间的关系。',
+    scope: '概念海报 / 神话与王权 / 四季与空间',
+    summary: '没有委托方的自命题海报。题材从神话塑像、王权肖像延伸到四季光影、建筑与山野，重心放在图像、字体与版式之间的关系。',
     tone: 'ink',
     images: [
       { src: '/works/self-initiated/hour-keeper.webp', alt: '流沙之身概念海报', title: '流沙之身', meta: '无形之神 01 / 时间' },
@@ -127,6 +127,10 @@ const allProjects: Project[] = [
       { src: '/works/self-initiated/sleeping-sky.webp', alt: '眠于群星概念海报', title: '眠于群星', meta: '无形之神 04 / 梦境' },
       { src: '/works/self-initiated/crown-of-iron.webp', alt: '国王铁誓概念海报', title: '铁誓 · 之王', meta: '王冠之重 I / 王权' },
       { src: '/works/self-initiated/crown-of-silence.webp', alt: '王后缄默概念海报', title: '缄默 · 王后', meta: '王冠之重 II / 王权' },
+      { src: '/works/self-initiated/spring-reverie.webp', alt: '春光初醒四季印象海报', title: '春光初醒', meta: '四季印象 01 / 春' },
+      { src: '/works/self-initiated/summer-reverie.webp', alt: '夏光浮梦四季印象海报', title: '夏光浮梦', meta: '四季印象 02 / 夏' },
+      { src: '/works/self-initiated/autumn-reverie.webp', alt: '秋光入梦四季印象海报', title: '秋光入梦', meta: '四季印象 03 / 秋' },
+      { src: '/works/self-initiated/winter-reverie.webp', alt: '冬日浮光四季印象海报', title: '冬日浮光', meta: '四季印象 04 / 冬' },
       { src: '/works/self-initiated/passages-of-a-year.webp', alt: '山有四季概念海报', title: '山有四季', meta: '风景研究 / 四季' },
       { src: '/works/self-initiated/between-angles.webp', alt: '折光概念海报', title: '折光', meta: '空间研究 / 建筑与光' },
     ],
